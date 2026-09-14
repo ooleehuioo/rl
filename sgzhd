@@ -28,39 +28,39 @@
 </head>
 <body>
     <div class="container">
-        <h1>📂 我的项目</h1>
+        <h1>📂 时光杂货店</h1>
         <table>
             <thead>
                 <tr>
-                    <th>项目名称</th>
-                    <th>简介</th>
-                    <th>技术栈</th>
-                    <th>状态</th>
-                    <th>链接</th>
+                    <th>角色</th>
+                    <th>历史最高收入</th>
+                    <th>当前最高</th>
+                    <th>拜访加成10%</th>
+                    <th>拜访激励加成20%</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- ✏️ 复制下面这一行来添加新项目 -->
                 <tr>
-                    <td><strong>个人主页</strong></td>
-                    <td>Lorraine Studio 官方网站</td>
-                    <td>HTML / CSS / JS</td>
-                    <td><span class="tag tag-done">已完成</span></td>
-                    <td><a class="link" href="https://lorraine.studio" target="_blank" rel="noopener noreferrer">访问 ↗</a></td>
+                    <td><strong>Stella</strong></td>
+                    <td>6.02+0.2840=6.304</td>
+                    <td>7.543</td>
+                    <td><span class="tag tag-done">6.934</span></td>
+                    <td><span class="tag tag-done">7.565</span></td>
                 </tr>
                 <tr>
-                    <td><strong>天气小程序</strong></td>
-                    <td>实时天气查询与未来7天预报</td>
-                    <td>Vue3 / OpenWeather API</td>
-                    <td><span class="tag tag-wip">开发中</span></td>
-                    <td><a class="link" href="#" target="_blank" rel="noopener noreferrer">GitHub ↗</a></td>
+                    <td><strong>ni9hts</strong></td>
+                    <td>4.61+0.1348</td>
+                    <td>5.69</td>
+                    <td><span class="tag tag-wip">5.22</span></td>
+                    <td><span class="tag tag-wip">5.69</span></td>
                 </tr>
                 <tr>
-                    <td><strong>读书笔记系统</strong></td>
-                    <td>Markdown 笔记管理与标签检索</td>
-                    <td>Next.js / Supabase</td>
-                    <td><span class="tag tag-plan">规划中</span></td>
-                    <td>—</td>
+                    <td><strong>1</strong></td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td><span class="tag tag-plan">4</span></td>
+                    <td>5</td>
                 </tr>
             </tbody>
         </table>
