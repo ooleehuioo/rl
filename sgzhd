@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorraine的项目集</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background: #0f0f0f; color: #fff; 
+            min-height: 100vh; padding: 60px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2rem; margin-bottom: 40px; text-align: center; }
+        .project-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 30px;
+            margin-bottom: 20px; transition: all 0.3s;
+        }
+        .project-card:hover { 
+            border-color: rgba(255,255,255,0.3); 
+            transform: translateY(-2px); 
+        }
+        .project-title { font-size: 1.3rem; margin-bottom: 10px; }
+        .project-desc { color: rgba(255,255,255,0.7); line-height: 1.6; }
+        .back-link {
+            display: inline-block; margin-top: 40px;
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            font-size: 0.9rem; transition: color 0.3s;
+        }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Lorraine 的项目集</h1>
+        
+        <div class="project-card">
+            <div class="project-title">个人主页 v2.0</div>
+            <div class="project-desc">基于纯 HTML/CSS 的极简暗色主题个人主页，支持响应式布局与平滑动画。</div>
+        </div>
+        
+        <div class="project-card">
+            <div class="project-title">AI 对话助手</div>
+            <div class="project-desc">集成多模型的智能对话工具，支持上下文记忆与流式输出。</div>
+        </div>
+        
+        <div class="project-card">
+            <div class="project-title">自动化工作流引擎</div>
+            <div class="project-desc">可视化编排的自动化任务平台，已接入 20+ 第三方服务。</div>
+        </div>
+        
+        <!-- 返回主页链接 -->
+        <a href="https://你的主页域名" class="back-link">← 返回 Lorraine.studio</a>
+    </div>
+</body>
+</html>
