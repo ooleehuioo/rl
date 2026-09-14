@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>welcome to Lorraine's studio</title>
+    <!-- 等宽数字字体，防止毫秒跳动时宽度抖动 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -22,73 +21,73 @@
             padding: 20px;
         }
 
-        .container {
-            text-align: center;
-            max-width: 600px;
-        }
+        .container { text-align: center; max-width: 600px; width: 100%; }
 
         .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 120px; height: 120px; border-radius: 50%;
             background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 48px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px; font-size: 48px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
+            font-size: 2.5rem; margin-bottom: 8px;
             background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
 
-        .subtitle {
-            color: #aaa;
-            font-size: 1.1rem;
-            margin-bottom: 32px;
-        }
+        .subtitle { color: #aaa; font-size: 1.1rem; margin-bottom: 32px; }
 
         .card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 24px;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 32px; margin-bottom: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .card p {
-            color: #ccc;
-            line-height: 1.8;
-            font-size: 1.05rem;
+        .card p { color: #ccc; line-height: 1.8; font-size: 1.05rem; }
+
+        /* ===== 时钟专属样式 ===== */
+        .clock-card { padding: 24px 32px; }
+
+        .clock-label {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px;
+            color: #888; margin-bottom: 8px; font-weight: 600;
         }
 
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .clock-date { font-size: 0.9rem; color: #999; margin-bottom: 12px; }
+
+        .clock-time {
+            display: flex; align-items: baseline; justify-content: center; gap: 2px;
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
         }
+
+        .clock-main {
+            font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 700; line-height: 1;
+            text-shadow: 0 0 20px rgba(118, 75, 162, 0.4);
+        }
+
+        .clock-ms {
+            font-size: clamp(1rem, 3vw, 1.6rem); font-weight: 400;
+            min-width: 3ch; text-align: left; opacity: 0.85;
+            background: linear-gradient(45deg, #667eea, #f093fb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .clock-ms::before { content: '.'; margin-right: 1px; }
+        /* ===== 时钟样式结束 ===== */
+
+        .links { display: flex; flex-direction: column; gap: 12px; }
 
         .link-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             padding: 14px 24px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.05rem;
-            transition: all 0.3s ease;
+            border-radius: 12px; color: #fff; text-decoration: none;
+            font-size: 1.05rem; transition: all 0.3s ease;
         }
 
         .link-btn:hover {
@@ -97,42 +96,27 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
-        .link-btn .icon {
-            font-size: 1.3rem;
-        }
+        .link-btn .icon { font-size: 1.3rem; }
 
-        .footer {
-            margin-top: 32px;
-            color: #666;
-            font-size: 0.85rem;
-        }
+        .footer { margin-top: 32px; color: #666; font-size: 0.85rem; }
 
         .tag {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin: 4px;
-            color: #ccc;
+            display: inline-block; background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 0.85rem; margin: 4px; color: #ccc;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头像 -->
         <div class="avatar">😎</div>
 
-        <!-- 名字 -->
         <h1>你好，我是Lorraine</h1>
         <p class="subtitle">🧑‍💻 开发者 · 📝 写作者 · 🚀 终身学习者</p>
 
         <!-- 介绍卡片 -->
         <div class="card">
-            <p>
-                欢迎来到我的个人主页！这里是我在互联网上的一片小天地。
-                喜欢折腾代码、分享技术、记录生活。
-            </p>
+            <p>欢迎来到我的个人主页！这里是我在互联网上的一片小天地。喜欢折腾代码、分享技术、记录生活。</p>
             <div style="margin-top: 16px;">
                 <span class="tag">HTML</span>
                 <span class="tag">CSS</span>
@@ -141,26 +125,65 @@
             </div>
         </div>
 
+        <!-- ⏱ 北京时间卡片 -->
+        <div class="card clock-card">
+            <div class="clock-label">Beijing Time · UTC+8</div>
+            <div class="clock-date" id="clockDate">----年--月--日 星期-</div>
+            <div class="clock-time">
+                <span class="clock-main" id="clockMain">--:--:--</span>
+                <span class="clock-ms" id="clockMs">---</span>
+            </div>
+        </div>
+
         <!-- 链接按钮 -->
         <div class="links">
             <a href="projects.html" target="_blank" rel="noopener noreferrer" class="link-btn">
-                <span class="icon">📂</span> 我的项目
+              <span class="icon">📂</span> 我的项目
             </a>
-            <a href="#" class="link-btn">
-                <span class="icon">📝</span> 博客文章
-            </a>
-            <a href="#" class="link-btn">
-                <span class="icon">🐙</span> GitHub
-            </a>
-            <a href="#" class="link-btn">
-                <span class="icon">💬</span> 联系我
-            </a>
+            <a href="#" class="link-btn"><span class="icon">📝</span> 博客文章</a>
+            <a href="#" class="link-btn"><span class="icon">🐙</span> GitHub</a>
+            <a href="#" class="link-btn"><span class="icon">💬</span> 联系我</a>
         </div>
 
-        <!-- 页脚 -->
-        <p class="footer">
-            © 2026 Lorraine · 由 Cloudflare Pages 驱动 · 全世界秒开 🚀
-        </p>
+        <p class="footer">© 2026 Lorraine · 由 Cloudflare Pages 驱动 · 全世界秒开 🚀</p>
     </div>
+
+    <script>
+        const bjDateFmt = new Intl.DateTimeFormat('zh-CN', {
+            timeZone: 'Asia/Shanghai',
+            year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long'
+        });
+
+        const dateEl = document.getElementById('clockDate');
+        const mainEl = document.getElementById('clockMain');
+        const msEl   = document.getElementById('clockMs');
+
+        let lastSec = -1;
+
+        function tick() {
+            const now = new Date();
+            // 手动计算北京时间，避免 Intl 毫秒兼容性问题
+            const bj = new Date(now.getTime() + (8 * 3600000 + now.getTimezoneOffset() * 60000));
+
+            const h  = String(bj.getHours()).padStart(2, '0');
+            const m  = String(bj.getMinutes()).padStart(2, '0');
+            const s  = String(bj.getSeconds()).padStart(2, '0');
+            const ms = String(bj.getMilliseconds()).padStart(3, '0');
+
+            // 仅在秒变化时更新日期和主时间，减少 DOM 写入
+            if (s !== lastSec) {
+                mainEl.textContent = `${h}:${m}:${s}`;
+                const parts = bjDateFmt.formatToParts(now);
+                const g = t => parts.find(p => p.type === t)?.value || '';
+                dateEl.textContent = `${g('year')}年${g('month')}月${g('day')}日 ${g('weekday')}`;
+                lastSec = s;
+            }
+
+            msEl.textContent = ms;
+            requestAnimationFrame(tick);
+        }
+
+        requestAnimationFrame(tick);
+    </script>
 </body>
 </html>
