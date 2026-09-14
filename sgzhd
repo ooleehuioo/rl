@@ -3,57 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lorraine的项目集</title>
+    <title>我的项目</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, sans-serif; 
-            background: #0f0f0f; color: #fff; 
-            min-height: 100vh; padding: 60px 20px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; padding: 40px 20px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; }
-        h1 { font-size: 2rem; margin-bottom: 40px; text-align: center; }
-        .project-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 30px;
-            margin-bottom: 20px; transition: all 0.3s;
+        h1 { text-align: center; margin-bottom: 30px; font-size: 28px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        th { background: #2d3436; color: #fff; padding: 16px 20px; text-align: left; font-weight: 600; font-size: 15px; }
+        td { padding: 16px 20px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .tag-done { background: #e8f5e9; color: #2e7d32; }
+        .tag-wip { background: #fff3e0; color: #e65100; }
+        .tag-plan { background: #e3f2fd; color: #1565c0; }
+        a.link { color: #0984e3; text-decoration: none; font-weight: 500; }
+        a.link:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            th, td { padding: 12px 14px; font-size: 13px; }
+            h1 { font-size: 22px; }
         }
-        .project-card:hover { 
-            border-color: rgba(255,255,255,0.3); 
-            transform: translateY(-2px); 
-        }
-        .project-title { font-size: 1.3rem; margin-bottom: 10px; }
-        .project-desc { color: rgba(255,255,255,0.7); line-height: 1.6; }
-        .back-link {
-            display: inline-block; margin-top: 40px;
-            color: rgba(255,255,255,0.6); text-decoration: none;
-            font-size: 0.9rem; transition: color 0.3s;
-        }
-        .back-link:hover { color: #fff; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Lorraine 的项目集</h1>
-        
-        <div class="project-card">
-            <div class="project-title">个人主页 v2.0</div>
-            <div class="project-desc">基于纯 HTML/CSS 的极简暗色主题个人主页，支持响应式布局与平滑动画。</div>
-        </div>
-        
-        <div class="project-card">
-            <div class="project-title">AI 对话助手</div>
-            <div class="project-desc">集成多模型的智能对话工具，支持上下文记忆与流式输出。</div>
-        </div>
-        
-        <div class="project-card">
-            <div class="project-title">自动化工作流引擎</div>
-            <div class="project-desc">可视化编排的自动化任务平台，已接入 20+ 第三方服务。</div>
-        </div>
-        
-        <!-- 返回主页链接 -->
-        <a href="https://你的主页域名" class="back-link">← 返回 Lorraine.studio</a>
+        <h1>📂 我的项目</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>项目名称</th>
+                    <th>简介</th>
+                    <th>技术栈</th>
+                    <th>状态</th>
+                    <th>链接</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ✏️ 复制下面这一行来添加新项目 -->
+                <tr>
+                    <td><strong>个人主页</strong></td>
+                    <td>Lorraine Studio 官方网站</td>
+                    <td>HTML / CSS / JS</td>
+                    <td><span class="tag tag-done">已完成</span></td>
+                    <td><a class="link" href="https://lorraine.studio" target="_blank" rel="noopener noreferrer">访问 ↗</a></td>
+                </tr>
+                <tr>
+                    <td><strong>天气小程序</strong></td>
+                    <td>实时天气查询与未来7天预报</td>
+                    <td>Vue3 / OpenWeather API</td>
+                    <td><span class="tag tag-wip">开发中</span></td>
+                    <td><a class="link" href="#" target="_blank" rel="noopener noreferrer">GitHub ↗</a></td>
+                </tr>
+                <tr>
+                    <td><strong>读书笔记系统</strong></td>
+                    <td>Markdown 笔记管理与标签检索</td>
+                    <td>Next.js / Supabase</td>
+                    <td><span class="tag tag-plan">规划中</span></td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
