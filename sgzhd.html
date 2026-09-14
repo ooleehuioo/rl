@@ -9,7 +9,77 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; padding: 40px 20px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; }
         h1 { text-align: center; margin-bottom: 30px; font-size: 28px; }
-        table { width: 50%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        th { background: #2d3436; color: #fff; padding: 16px 20px; text-align: left; font-weight: 600; font-size: 15px; }
+        td { padding: 16px 20px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .tag-done { background: #e8f5e9; color: #2e7d32; }
+        .tag-wip { background: #fff3e0; color: #e65100; }
+        .tag-plan { background: #e3f2fd; color: #1565c0; }
+        a.link { color: #0984e3; text-decoration: none; font-weight: 500; }
+        a.link:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            th, td { padding: 12px 14px; font-size: 13px; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📂 时光杂货店</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>角色</th>
+                    <th>历史最高收入</th>
+                    <th>当前最高</th>
+                    <th>拜访加成10%</th>
+                    <th>拜访激励加成20%</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ✏️ 复制下面这一行来添加新项目 -->
+                <tr>
+                    <td><strong>Stella</strong></td>
+                    <td>6.02+0.2840=6.304</td>
+                    <td>7.543</td>
+                    <td><span class="tag tag-done">6.934</span></td>
+                    <td><span class="tag tag-done">7.565</span></td>
+                </tr>
+                <tr>
+                    <td><strong>ni9ht</strong></td>
+                    <td>4.61+0.1348=4.7448</td>
+                    <td>5.69</td>
+                    <td><span class="tag tag-wip">5.22</span></td>
+                    <td><span class="tag tag-wip">5.69</span></td>
+                </tr>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td><span class="tag tag-plan">4</span></td>
+                    <td>5</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光杂货店</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; padding: 40px 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; font-size: 28px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
         th { background: #2d3436; color: #fff; padding: 16px 20px; text-align: left; font-weight: 600; font-size: 15px; }
         td { padding: 16px 20px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
