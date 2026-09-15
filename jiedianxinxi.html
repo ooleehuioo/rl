@@ -1,0 +1,822 @@
+function formatBeijingTime() {
+  const d = new Date();
+  // 转为北京时间 (UTC+8)
+  const bj = new Date(d.getTime() + (8 * 60 * 60 * 1000));
+  const Y = bj.getUTCFullYear();
+  const M = String(bj.getUTCMonth() + 1).padStart(2, '0');
+  const D = String(bj.getUTCDate()).padStart(2, '0');
+  const h = String(bj.getUTCHours()).padStart(2, '0');
+  const m = String(bj.getUTCMinutes()).padStart(2, '0');
+  const s = String(bj.getUTCSeconds()).padStart(2, '0');
+  const ms = String(bj.getUTCMilliseconds()).padStart(3, '0');
+  return `${Y}-${M}-${D} ${h}:${m}:${s}.${ms} (UTC+8)`;
+}
+export default {
+  async fetch(request, env, ctx) {
+    const cf = request.cf || {};
+    const url = new URL(request.url);
+    const UA = request.headers.get('User-Agent') || '未知';
+    const acceptLang = request.headers.get('Accept-Language') || '';
+
+    // ===== 速度测试端点 =====
+    if (url.pathname === '/speedtest') {
+      // 返回 10MB 随机数据用于测速
+      const size = 10 * 1024 * 1024; // 10MB
+      const chunk = new Uint8Array(1024 * 64); // 64KB chunk
+      let sent = 0;
+      const stream = new ReadableStream({
+        pull(controller) {
+          if (sent >= size) {
+            controller.close();
+            return;
+          }
+          const toSend = Math.min(chunk.byteLength, size - sent);
+          controller.enqueue(new Uint8Array(chunk.buffer, 0, toSend));
+          sent += toSend;
+        }
+      });
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          'Cache-Control': 'no-store',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+
+    // ===== 多语言判断 =====
+    const prefersChinese = /zh|zh-CN|zh-TW|zh-HK/i.test(acceptLang);
+    const lang = prefersChinese ? 'zh' : 'en';
+
+    // ===== 获取客户端真实 IP =====
+    const rawIP = request.headers.get('CF-Connecting-IP') || 
+                  request.headers.get('X-Forwarded-For') || 
+                  request.headers.get('X-Real-IP') || 
+                  '未知';
+    const clientIP = rawIP.split(',')[0].trim();
+    const isIPv6 = clientIP.includes(':');
+    const ipType = isIPv6 ? 'IPv6' : 'IPv4';
+
+    // ===== VPS/客户端环境检测 =====
+    const isTerminal = /curl|wget|python|go-http|libwww|okhttp|axios|node-fetch|requests/i.test(UA);
+    const isBrowser = /Mozilla|Chrome|Safari|Firefox|Edge/i.test(UA) && !isTerminal;
+    const isVPS = !isBrowser;
+
+    // ===== 地理信息 =====
+    const country = cf.country || '未知';
+    const city = cf.city || '未知';
+    const region = cf.region || '未知';
+    const timezone = cf.timezone || 'UTC';
+    const colo = cf.colo || '未知';
+    const continent = cf.continent || '未知';
+    const postalCode = cf.postalCode || '未知';
+    const latitude = cf.latitude || '未知';
+    const longitude = cf.longitude || '未知';
+
+    // ===== 网络信息 =====
+    const asOrganization = cf.asOrganization || `AS${cf.asn}` || '未知';
+    const asn = cf.asn || '未知';
+    const httpProtocol = cf.httpProtocol || 'HTTP/2';
+    const tlsVersion = cf.tlsVersion || '未知';
+    const tlsCipher = cf.tlsCipher || '未知';
+
+    // ===== 客户端信息 =====
+    const botScore = cf.botManagement?.score ?? 'N/A';
+    const isTor = cf.isTor === true ? '是' : '否';
+    const isEU = cf.isEUCountry === '1' ? '是' : '否';
+
+    // ===== 判断环境类型 =====
+    let envType, envIcon;
+    if (isTerminal) {
+      envType = lang === 'zh' ? '终端/命令行' : 'Terminal/CLI';
+      envIcon = '💻';
+    } else if (isBrowser) {
+      envType = lang === 'zh' ? '浏览器' : 'Browser';
+      envIcon = '🌐';
+    } else {
+      envType = lang === 'zh' ? 'VPS/服务器' : 'VPS/Server';
+      envIcon = '🖥️';
+    }
+
+    // ===== 设备/系统判断 =====
+    let os = '未知';
+    if (/Windows/i.test(UA)) os = 'Windows';
+    else if (/Mac OS/i.test(UA)) os = 'macOS';
+    else if (/Linux/i.test(UA) && !/Android/i.test(UA)) os = 'Linux';
+    else if (/Android/i.test(UA)) os = 'Android';
+    else if (/iPhone|iPad|iOS/i.test(UA)) os = 'iOS';
+    else if (/CrOS/i.test(UA)) os = 'ChromeOS';
+
+    // ===== 反向地理编码 =====
+    let geoAddress = null;
+    if (latitude !== '未知' && longitude !== '未知') {
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=14&accept-language=${lang === 'zh' ? 'zh' : 'en'}`,
+          { headers: { 'User-Agent': 'CloudflareWorker/1.0' } }
+        );
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          geoAddress = geoData.display_name || null;
+        }
+      } catch (e) {
+        geoAddress = null;
+      }
+    }
+
+    // ===== 响应处理 =====
+    if (isTerminal || isVPS) {
+      const T = lang === 'zh' ? {
+        title: '节点信息',
+        domain: '访问域名',
+        country: '访问国家/地区',
+        city: '访问城市',
+        region: '访问区域',
+        continent: '访问大洲',
+        postal: '邮政编码',
+        coords: '经纬度',
+        address: '具体地址',
+        timezone: '时区',
+        colo: 'Cloudflare 节点',
+        network: '网络信息',
+        ip: '客户端IP',
+        asn: '运营商/ASN',
+        tls: 'TLS 版本',
+        cipher: 'TLS 加密套件',
+        http: 'HTTP 协议',
+        client: '客户端信息',
+        env: '环境',
+        os: '操作系统',
+        ua: 'User-Agent',
+        security: '安全信息',
+        bot: '机器人评分',
+        tor: '是否是 Tor',
+        eu: '是否在欧盟',
+        time: '查询时间',
+      } : {
+        title: 'Node Info',
+        domain: 'Domain',
+        country: 'Country',
+        city: 'City',
+        region: 'Region',
+        continent: 'Continent',
+        postal: 'Postal Code',
+        coords: 'Coordinates',
+        address: 'Address',
+        timezone: 'Timezone',
+        colo: 'CF Colo',
+        network: 'Network',
+        ip: 'Client IP',
+        asn: 'ASN',
+        tls: 'TLS Version',
+        cipher: 'TLS Cipher',
+        http: 'HTTP Protocol',
+        client: 'Client',
+        env: 'Environment',
+        os: 'OS',
+        ua: 'User-Agent',
+        security: 'Security',
+        bot: 'Bot Score',
+        tor: 'Tor',
+        eu: 'EU',
+        time: 'Query Time',
+      };
+
+      const text = [
+        `🔍 ${T.title} - ${url.hostname}`,
+        ``,
+        `🌍 ${T.domain}: ${url.hostname}`,
+        `📍 ${T.country}: ${country}`,
+        `🏙️ ${T.city}: ${city}`,
+        `🏛️ ${T.region}: ${region}`,
+        `🗺️ ${T.continent}: ${continent}`,
+        `📮 ${T.postal}: ${postalCode}`,
+        `🌐 ${T.coords}: ${latitude}, ${longitude}`,
+        ...(geoAddress ? [`📍 ${T.address}: ${geoAddress}`] : []),
+        `🕐 ${T.timezone}: ${timezone}`,
+        `🖥️ ${T.colo}: ${colo}`,
+        ``,
+        `📡 ${T.network}:`,
+        `🔗 ${T.ip}: ${clientIP} (${ipType})`,
+        `🏢 ${T.asn}: ${asOrganization} (AS${asn})`,
+        `🔒 ${T.tls}: ${tlsVersion}`,
+        `🔑 ${T.cipher}: ${tlsCipher}`,
+        `📶 ${T.http}: ${httpProtocol}`,
+        ``,
+        `🖥️ ${T.client}:`,
+        `🔍 ${T.env}: ${envType}`,
+        `💿 ${T.os}: ${os}`,
+        `🧠 ${T.ua}: ${UA}`,
+        ``,
+        `🛡️ ${T.security}:`,
+        `🤖 ${T.bot}: ${botScore}`,
+        `🌐 ${T.tor}: ${isTor}`,
+        `🇪🇺 ${T.eu}: ${isEU}`,
+        ``,
+        `⏰ ${T.time}: ${formatBeijingTime()}`,
+      ].join('\n');
+      return new Response(text, {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      });
+    }
+
+    // 浏览器返回 HTML
+    const html = generateHTML({
+      hostname: url.hostname, clientIP, ipType, country, city, region,
+      continent, postalCode, latitude, longitude, timezone, colo,
+      asOrganization, asn, httpProtocol, tlsVersion, tlsCipher,
+      botScore, isTor, isEU, envType, envIcon, os, UA, geoAddress, lang,
+    });
+
+    return new Response(html, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  },
+};
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function generateHTML(data) {
+  const {
+    hostname, clientIP, ipType, country, city, region,
+    continent, postalCode, latitude, longitude, timezone, colo,
+    asOrganization, asn, httpProtocol, tlsVersion, tlsCipher,
+    botScore, isTor, isEU, envType, envIcon, os, UA, geoAddress, lang,
+  } = data;
+
+  const hasCoords = latitude !== '未知' && longitude !== '未知';
+
+  const T = lang === 'zh' ? {
+    title: '节点信息',
+    subtitle: 'Cloudflare Workers',
+    location: '📍 位置信息',
+    domain: '🌍 域名',
+    country: '🏳️ 国家/地区',
+    city: '🏙️ 城市',
+    region: '🏛️ 区域',
+    continent: '🗺️ 大洲',
+    postal: '📮 邮政编码',
+    address: '📍 具体地址',
+    coords: '🌐 经纬度',
+    viewMap: '🗺️ 在 Google Maps 查看',
+    timezone: '🕐 时区',
+    colo: '🖥️ CF 节点',
+    ipTitle: '🌐 IP 地址',
+    cfIP: '☁️ CF 连接 IP',
+    browserIPv4: '🌐 浏览器 IPv4',
+    browserIPv6: '🌐 浏览器 IPv6',
+    detecting: '检测中...',
+    noIPv4: '无 IPv4',
+    noIPv6: '无 IPv6',
+    networkTitle: '📡 网络信息',
+    asn: '🏢 运营商/ASN',
+    tls: '🔒 TLS 版本',
+    cipher: '🔑 TLS 加密',
+    http: '📶 HTTP 协议',
+    clientTitle: '🖥️ 客户端',
+    env: '🔍 环境',
+    os: '💿 操作系统',
+    ua: '🧠 User-Agent',
+    securityTitle: '🛡️ 安全',
+    bot: '🤖 机器人评分',
+    tor: '🌐 Tor',
+    eu: '🇪🇺 欧盟',
+    speedTitle: '⚡ 网络测速',
+    latency: '🕐 延迟（RTT）',
+    download: '📥 下载速度',
+    testing: '测试中...',
+    startTest: '▶️ 开始测速',
+    testing2: '测试中...',
+    copied: '✅ 已复制',
+    copy: '📋 复制',
+    footer: '查询时间',
+  } : {
+    title: 'Node Info',
+    subtitle: 'Cloudflare Workers',
+    location: '📍 Location',
+    domain: '🌍 Domain',
+    country: '🏳️ Country',
+    city: '🏙️ City',
+    region: '🏛️ Region',
+    continent: '🗺️ Continent',
+    postal: '📮 Postal Code',
+    address: '📍 Address',
+    coords: '🌐 Coordinates',
+    viewMap: '🗺️ View on Google Maps',
+    timezone: '🕐 Timezone',
+    colo: '🖥️ CF Colo',
+    ipTitle: '🌐 IP Address',
+    cfIP: '☁️ CF Connecting IP',
+    browserIPv4: '🌐 Browser IPv4',
+    browserIPv6: '🌐 Browser IPv6',
+    detecting: 'Detecting...',
+    noIPv4: 'No IPv4',
+    noIPv6: 'No IPv6',
+    networkTitle: '📡 Network',
+    asn: '🏢 ASN',
+    tls: '🔒 TLS Version',
+    cipher: '🔑 TLS Cipher',
+    http: '📶 HTTP Protocol',
+    clientTitle: '🖥️ Client',
+    env: '🔍 Environment',
+    os: '💿 OS',
+    ua: '🧠 User-Agent',
+    securityTitle: '🛡️ Security',
+    bot: '🤖 Bot Score',
+    tor: '🌐 Tor',
+    eu: '🇪🇺 EU',
+    speedTitle: '⚡ Speed Test',
+    latency: '🕐 Latency (RTT)',
+    download: '📥 Download Speed',
+    testing: 'Testing...',
+    startTest: '▶️ Start Test',
+    testing2: 'Testing...',
+    copied: '✅ Copied',
+    copy: '📋 Copy',
+    footer: 'Query Time',
+  };
+
+  return `<!DOCTYPE html>
+<html lang="${lang === 'zh' ? 'zh-CN' : 'en'}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${T.title}</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --orange: #d2991d;
+      --red: #f85149;
+      --purple: #a371f7;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+    .container { max-width: 780px; width: 100%; }
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .header .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      font-family: monospace;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin: 6px 4px;
+    }
+    .badge-ipv4 { background: rgba(88,166,255,0.15); color: var(--accent); }
+    .badge-ipv6 { background: rgba(163,113,247,0.15); color: var(--purple); }
+    .badge-env { background: rgba(63,185,80,0.15); color: var(--green); }
+    .badge-lang {
+      background: rgba(210,153,29,0.15); color: var(--orange);
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .badge-lang:hover { opacity: 0.8; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      gap: 12px;
+    }
+    .row:last-child { border-bottom: none; }
+    .label {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .value {
+      font-size: 14px;
+      text-align: right;
+      word-break: break-all;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .value.highlight { color: var(--accent); font-weight: 600; }
+    .value.address {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    .map-link {
+      display: inline-block;
+      margin-top: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .map-link:hover { text-decoration: underline; }
+
+    /* 复制按钮 */
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      white-space: nowrap;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .copy-btn.copied {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* 测速按钮 */
+    .speed-btn {
+      background: rgba(88,166,255,0.12);
+      border: 1px solid rgba(88,166,255,0.3);
+      color: var(--accent);
+      cursor: pointer;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .speed-btn:hover { background: rgba(88,166,255,0.2); }
+    .speed-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .speed-result {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 14px;
+      color: var(--green);
+      font-weight: 600;
+    }
+    .speed-result.warn { color: var(--orange); }
+    .speed-result.bad { color: var(--red); }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 500px) {
+      body { padding: 20px 10px; }
+      .card { padding: 16px; }
+      .row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .value { text-align: left; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <div style="display:flex; justify-content:center; margin-bottom:20px;">
+      <div id="live-clock-wrap" style="
+        display:inline-flex; align-items:center; gap:8px;
+        background:rgba(255,255,255,0.04);
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:40px;
+        padding:8px 22px;
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+        box-shadow:0 0 24px rgba(99,102,241,0.15), inset 0 0 12px rgba(99,102,241,0.06);
+      ">
+        <span style="font-size:16px;">🕐</span>
+        <span style="font-size:12px; font-weight:500; color:var(--secondary); letter-spacing:1px;">北京时间</span>
+        <span id="live-clock" style="font-size:17px; font-weight:700; color:var(--accent); font-family:'SF Mono','Fira Code','Consolas',monospace; letter-spacing:1px; text-shadow:0 0 12px rgba(99,102,241,0.5); min-width:190px;">--</span>
+      </div>
+    </div>
+    <div class="header">
+      <h1>🔍 ${T.title}</h1>
+      
+      <span class="badge badge-${ipType === 'IPv6' ? 'ipv6' : 'ipv4'}">CF: ${ipType}</span>
+      <span class="badge badge-env">${envIcon} ${esc(envType)}</span>
+      <a class="badge badge-lang" href="?lang=${lang === 'zh' ? 'en' : 'zh'}" title="Switch Language">${lang === 'zh' ? '🌐 EN' : '🌐 中文'}</a>
+    </div>
+
+    <!-- 位置信息 -->
+    <div class="card">
+      <div class="card-title">${T.location}</div>
+      <div class="row">
+        <span class="label">${T.country}</span>
+        <span class="value">${esc(country)} <button class="copy-btn" onclick="copyText('${esc(country)}',this)">${T.copy}</button></span>
+      </div>
+      <div class="row"><span class="label">${T.city}</span><span class="value">${esc(city)}</span></div>
+      <div class="row"><span class="label">${T.region}</span><span class="value">${esc(region)}</span></div>
+      <div class="row"><span class="label">${T.continent}</span><span class="value">${esc(continent)}</span></div>
+      <div class="row"><span class="label">${T.postal}</span><span class="value">${esc(postalCode)}</span></div>
+      ${geoAddress ? `
+      <div class="row">
+        <span class="label">${T.address}</span>
+        <span class="value address">${esc(geoAddress)} <button class="copy-btn" onclick="copyText('${esc(geoAddress.replace(/'/g, "\\'"))}',this)">${T.copy}</button></span>
+      </div>` : ''}
+      <div class="row">
+        <span class="label">${T.coords}</span>
+        <span class="value">
+          ${latitude}, ${longitude}
+          <button class="copy-btn" onclick="copyText('${latitude},${longitude}',this)">${T.copy}</button>
+          ${hasCoords ? `<br><a class="map-link" href="https://www.google.com/maps?q=${latitude},${longitude}" target="_blank" rel="noopener">${T.viewMap}</a>` : ''}
+        </span>
+      </div>
+      <div class="row"><span class="label">${T.timezone}</span><span class="value">${esc(timezone)}</span></div>
+      <div class="row"><span class="label">${T.colo}</span><span class="value highlight">${esc(colo)}</span></div>
+    </div>
+
+    <!-- IP 信息 -->
+    <div class="card">
+      <div class="card-title">${T.ipTitle}</div>
+      <div class="row">
+        <span class="label">${T.cfIP}</span>
+        <span class="value highlight">${esc(clientIP)} (${ipType}) <button class="copy-btn" onclick="copyText('${esc(clientIP)}',this)">${T.copy}</button></span>
+      </div>
+      <div class="row">
+        <span class="label">${T.browserIPv4}</span>
+        <span class="value" id="ipv4-address">${T.detecting}</span>
+      </div>
+      <div class="row">
+        <span class="label">${T.browserIPv6}</span>
+        <span class="value" id="ipv6-address">${T.detecting}</span>
+      </div>
+    </div>
+
+    <!-- 网络信息 -->
+    <div class="card">
+      <div class="card-title">${T.networkTitle}</div>
+      <div class="row"><span class="label">${T.asn}</span><span class="value">${esc(asOrganization)} (AS${asn})</span></div>
+      <div class="row"><span class="label">${T.tls}</span><span class="value">${esc(tlsVersion)}</span></div>
+      <div class="row"><span class="label">${T.cipher}</span><span class="value" style="font-size:11px;">${esc(tlsCipher)}</span></div>
+      <div class="row"><span class="label">${T.http}</span><span class="value">${esc(httpProtocol)}</span></div>
+    </div>
+
+    <!-- 客户端信息 -->
+    <div class="card">
+      <div class="card-title">${T.clientTitle}</div>
+      <div class="row"><span class="label">${T.env}</span><span class="value">${envIcon} ${esc(envType)}</span></div>
+      <div class="row"><span class="label">${T.os}</span><span class="value">${esc(os)}</span></div>
+      <div class="row"><span class="label">${T.ua}</span><span class="value" style="font-size:11px;">${esc(UA)}</span></div>
+    </div>
+
+    <!-- 安全信息 -->
+    <div class="card">
+      <div class="card-title">${T.securityTitle}</div>
+      <div class="row"><span class="label">${T.bot}</span><span class="value">${botScore}</span></div>
+      <div class="row"><span class="label">${T.tor}</span><span class="value">${isTor}</span></div>
+      <div class="row"><span class="label">${T.eu}</span><span class="value">${isEU}</span></div>
+    </div>
+
+    <!-- 小工具 -->
+    <div class="card">
+      <div class="card-title">${T.tool}</div>
+      <div class="row"><span class="label">${T.startTest}</span><span class="value">${botScore}</span></div>
+    </div>
+
+    <!-- 测速 -->
+    <div class="card">
+      <div class="card-title">${T.speedTitle}</div>
+      <div class="row">
+        <span class="label">${T.latency}</span>
+        <span class="value" id="latency-result">-</span>
+      </div>
+      <div class="row">
+        <span class="label">${T.download}</span>
+        <span class="value" id="speed-result">-</span>
+      </div>
+      <div class="row">
+        <span class="label"></span>
+        <span class="value"><button class="speed-btn" id="speed-btn" onclick="runSpeedTest()">${T.startTest}</button></span>
+      </div>
+    </div>
+
+    <div class="footer">
+      ⏰ ${T.footer}: ${formatBeijingTime()} · Powered by Cloudflare Workers
+    </div>
+  </div>
+
+  <script>
+    // ===== 获取浏览器 IP =====
+    async function fetchIP() {
+      const ipv4El = document.getElementById('ipv4-address');
+      const ipv6El = document.getElementById('ipv6-address');
+
+      try {
+        const v4Res = await fetch('https://api.ipify.org?format=json');
+        const v4Data = await v4Res.json();
+        ipv4El.textContent = v4Data.ip;
+        ipv4El.classList.add('highlight');
+        // 加复制按钮
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = '${T.copy}';
+        btn.onclick = function(){ copyText(v4Data.ip, btn); };
+        ipv4El.appendChild(btn);
+      } catch (e) {
+        ipv4El.textContent = '${T.noIPv4}';
+        ipv4El.style.color = 'var(--muted)';
+      }
+
+      try {
+        const v6Res = await fetch('https://api6.ipify.org?format=json');
+        const v6Data = await v6Res.json();
+        ipv6El.textContent = v6Data.ip;
+        ipv6El.classList.add('highlight');
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = '${T.copy}';
+        btn.onclick = function(){ copyText(v6Data.ip, btn); };
+        ipv6El.appendChild(btn);
+      } catch (e) {
+        ipv6El.textContent = '${T.noIPv6}';
+        ipv6El.style.color = 'var(--muted)';
+      }
+    }
+    fetchIP();
+
+    // ===== 复制功能 =====
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '${T.copied}';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1500);
+      }).catch(() => {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        const original = btn.textContent;
+        btn.textContent = '${T.copied}';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1500);
+      });
+    }
+
+    // ===== 测速功能 =====
+    async function runSpeedTest() {
+      const btn = document.getElementById('speed-btn');
+      const latencyEl = document.getElementById('latency-result');
+      const speedEl = document.getElementById('speed-result');
+
+      btn.disabled = true;
+      btn.textContent = '${T.testing2}';
+      latencyEl.textContent = '${T.testing}';
+      latencyEl.className = 'value';
+      speedEl.textContent = '${T.testing}';
+      speedEl.className = 'value';
+
+      // --- 延迟测试：测 5 次取平均 ---
+      let totalRTT = 0;
+      const pingCount = 5;
+      for (let i = 0; i < pingCount; i++) {
+        const start = performance.now();
+        try {
+          await fetch(window.location.origin + '/?nocache=' + Math.random(), { method: 'HEAD', cache: 'no-store' });
+        } catch(e) {}
+        const end = performance.now();
+        totalRTT += (end - start);
+      }
+      const avgRTT = Math.round(totalRTT / pingCount);
+
+      // 显示延迟
+      let rttClass = '';
+      if (avgRTT < 50) rttClass = 'speed-result';
+      else if (avgRTT < 150) rttClass = 'speed-result warn';
+      else rttClass = 'speed-result bad';
+      latencyEl.textContent = avgRTT + ' ms';
+      latencyEl.className = 'value ' + rttClass;
+
+      // --- 下载速度测试 ---
+      const testUrl = window.location.origin + '/speedtest?nocache=' + Math.random();
+      const startTime = performance.now();
+      let totalBytes = 0;
+
+      try {
+        const response = await fetch(testUrl, { cache: 'no-store' });
+        const reader = response.body.getReader();
+
+        // 最多测 5 秒
+        const maxDuration = 5000;
+        const startedAt = Date.now();
+
+        while (true) {
+          const { done, value } = await reader.read({});
+          if (done) break;
+          totalBytes += value.byteLength;
+          if (Date.now() - startedAt >= maxDuration) {
+            reader.cancel();
+            break;
+          }
+        }
+
+        const endTime = performance.now();
+        const durationSec = (endTime - startTime) / 1000;
+        const speedMbps = ((totalBytes * 8) / durationSec / 1000000).toFixed(2);
+        const speedMBs = (totalBytes / durationSec / 1000000).toFixed(2);
+
+        let speedClass = '';
+        if (speedMbps >= 50) speedClass = 'speed-result';
+        else if (speedMbps >= 10) speedClass = 'speed-result warn';
+        else speedClass = 'speed-result bad';
+
+        speedEl.textContent = speedMBs + ' MB/s (' + speedMbps + ' Mbps)';
+        speedEl.className = 'value ' + speedClass;
+
+      } catch(e) {
+        speedEl.textContent = 'Test failed';
+        speedEl.className = 'value bad';
+      }
+
+      btn.disabled = false;
+      btn.textContent = T.startTest;
+    }
+
+    
+
+
+    // ===== 实时北京时间 =====
+    function updateClock() {
+     const now = new Date();
+     const Y = now.getFullYear();
+     const M = String(now.getMonth() + 1).padStart(2, '0');
+     const D = String(now.getDate()).padStart(2, '0');
+     const h = String(now.getHours()).padStart(2, '0');
+     const m = String(now.getMinutes()).padStart(2, '0');
+     const s = String(now.getSeconds()).padStart(2, '0');
+     const ms = String(now.getMilliseconds()).padStart(3, '0');
+     const el = document.getElementById('live-clock');
+     if (!el) return;
+     el.innerHTML = Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s + '<span style="font-size:12px;opacity:0.5;font-weight:500;">.' + ms + '</span>';
+}
+     
+  </script>
+</body>
+</html>`;
+}
