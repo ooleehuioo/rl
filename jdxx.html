@@ -1,28 +1,13 @@
-function formatBeijingTime() {
-  const d = new Date();
-  // 转为北京时间 (UTC+8)
-  const bj = new Date(d.getTime() + (8 * 60 * 60 * 1000));
-  const Y = bj.getUTCFullYear();
-  const M = String(bj.getUTCMonth() + 1).padStart(2, '0');
-  const D = String(bj.getUTCDate()).padStart(2, '0');
-  const h = String(bj.getUTCHours()).padStart(2, '0');
-  const m = String(bj.getUTCMinutes()).padStart(2, '0');
-  const s = String(bj.getUTCSeconds()).padStart(2, '0');
-  const ms = String(bj.getUTCMilliseconds()).padStart(3, '0');
-  return `${Y}-${M}-${D} ${h}:${m}:${s}.${ms} (UTC+8)`;
-}
 export default {
   async fetch(request, env, ctx) {
     const cf = request.cf || {};
     const url = new URL(request.url);
     const UA = request.headers.get('User-Agent') || '未知';
-    const acceptLang = request.headers.get('Accept-Language') || '';
 
     // ===== 速度测试端点 =====
     if (url.pathname === '/speedtest') {
-      // 返回 10MB 随机数据用于测速
-      const size = 10 * 1024 * 1024; // 10MB
-      const chunk = new Uint8Array(1024 * 64); // 64KB chunk
+      const size = 10 * 1024 * 1024;
+      const chunk = new Uint8Array(1024 * 64);
       let sent = 0;
       const stream = new ReadableStream({
         pull(controller) {
@@ -44,14 +29,10 @@ export default {
       });
     }
 
-    // ===== 多语言判断 =====
-    const prefersChinese = /zh|zh-CN|zh-TW|zh-HK/i.test(acceptLang);
-    const lang = prefersChinese ? 'zh' : 'en';
-
     // ===== 获取客户端真实 IP =====
-    const rawIP = request.headers.get('CF-Connecting-IP') || 
-                  request.headers.get('X-Forwarded-For') || 
-                  request.headers.get('X-Real-IP') || 
+    const rawIP = request.headers.get('CF-Connecting-IP') ||
+                  request.headers.get('X-Forwarded-For') ||
+                  request.headers.get('X-Real-IP') ||
                   '未知';
     const clientIP = rawIP.split(',')[0].trim();
     const isIPv6 = clientIP.includes(':');
@@ -88,13 +69,13 @@ export default {
     // ===== 判断环境类型 =====
     let envType, envIcon;
     if (isTerminal) {
-      envType = lang === 'zh' ? '终端/命令行' : 'Terminal/CLI';
+      envType = '终端/命令行';
       envIcon = '💻';
     } else if (isBrowser) {
-      envType = lang === 'zh' ? '浏览器' : 'Browser';
+      envType = '浏览器';
       envIcon = '🌐';
     } else {
-      envType = lang === 'zh' ? 'VPS/服务器' : 'VPS/Server';
+      envType = 'VPS/服务器';
       envIcon = '🖥️';
     }
 
@@ -112,7 +93,7 @@ export default {
     if (latitude !== '未知' && longitude !== '未知') {
       try {
         const geoRes = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=14&accept-language=${lang === 'zh' ? 'zh' : 'en'}`,
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=14&accept-language=zh`,
           { headers: { 'User-Agent': 'CloudflareWorker/1.0' } }
         );
         if (geoRes.ok) {
@@ -124,9 +105,13 @@ export default {
       }
     }
 
+    // ===== 生成当前时间字符串 =====
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
     // ===== 响应处理 =====
     if (isTerminal || isVPS) {
-      const T = lang === 'zh' ? {
+      const T = {
         title: '节点信息',
         domain: '访问域名',
         country: '访问国家/地区',
@@ -153,35 +138,7 @@ export default {
         tor: '是否是 Tor',
         eu: '是否在欧盟',
         time: '查询时间',
-      } : {
-        title: 'Node Info',
-        domain: 'Domain',
-        country: 'Country',
-        city: 'City',
-        region: 'Region',
-        continent: 'Continent',
-        postal: 'Postal Code',
-        coords: 'Coordinates',
-        address: 'Address',
-        timezone: 'Timezone',
-        colo: 'CF Colo',
-        network: 'Network',
-        ip: 'Client IP',
-        asn: 'ASN',
-        tls: 'TLS Version',
-        cipher: 'TLS Cipher',
-        http: 'HTTP Protocol',
-        client: 'Client',
-        env: 'Environment',
-        os: 'OS',
-        ua: 'User-Agent',
-        security: 'Security',
-        bot: 'Bot Score',
-        tor: 'Tor',
-        eu: 'EU',
-        time: 'Query Time',
       };
-
       const text = [
         `🔍 ${T.title} - ${url.hostname}`,
         ``,
@@ -213,7 +170,7 @@ export default {
         `🌐 ${T.tor}: ${isTor}`,
         `🇪🇺 ${T.eu}: ${isEU}`,
         ``,
-        `⏰ ${T.time}: ${formatBeijingTime()}`,
+        `⏰ ${T.time}: ${timeStr}`,
       ].join('\n');
       return new Response(text, {
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
@@ -225,9 +182,8 @@ export default {
       hostname: url.hostname, clientIP, ipType, country, city, region,
       continent, postalCode, latitude, longitude, timezone, colo,
       asOrganization, asn, httpProtocol, tlsVersion, tlsCipher,
-      botScore, isTor, isEU, envType, envIcon, os, UA, geoAddress, lang,
+      botScore, isTor, isEU, envType, envIcon, os, UA, geoAddress, timeStr,
     });
-
     return new Response(html, {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -243,12 +199,10 @@ function generateHTML(data) {
     hostname, clientIP, ipType, country, city, region,
     continent, postalCode, latitude, longitude, timezone, colo,
     asOrganization, asn, httpProtocol, tlsVersion, tlsCipher,
-    botScore, isTor, isEU, envType, envIcon, os, UA, geoAddress, lang,
+    botScore, isTor, isEU, envType, envIcon, os, UA, geoAddress, timeStr,
   } = data;
-
   const hasCoords = latitude !== '未知' && longitude !== '未知';
-
-  const T = lang === 'zh' ? {
+  const T = {
     title: '节点信息',
     subtitle: 'Cloudflare Workers',
     location: '📍 位置信息',
@@ -292,54 +246,9 @@ function generateHTML(data) {
     copied: '✅ 已复制',
     copy: '📋 复制',
     footer: '查询时间',
-  } : {
-    title: 'Node Info',
-    subtitle: 'Cloudflare Workers',
-    location: '📍 Location',
-    domain: '🌍 Domain',
-    country: '🏳️ Country',
-    city: '🏙️ City',
-    region: '🏛️ Region',
-    continent: '🗺️ Continent',
-    postal: '📮 Postal Code',
-    address: '📍 Address',
-    coords: '🌐 Coordinates',
-    viewMap: '🗺️ View on Google Maps',
-    timezone: '🕐 Timezone',
-    colo: '🖥️ CF Colo',
-    ipTitle: '🌐 IP Address',
-    cfIP: '☁️ CF Connecting IP',
-    browserIPv4: '🌐 Browser IPv4',
-    browserIPv6: '🌐 Browser IPv6',
-    detecting: 'Detecting...',
-    noIPv4: 'No IPv4',
-    noIPv6: 'No IPv6',
-    networkTitle: '📡 Network',
-    asn: '🏢 ASN',
-    tls: '🔒 TLS Version',
-    cipher: '🔑 TLS Cipher',
-    http: '📶 HTTP Protocol',
-    clientTitle: '🖥️ Client',
-    env: '🔍 Environment',
-    os: '💿 OS',
-    ua: '🧠 User-Agent',
-    securityTitle: '🛡️ Security',
-    bot: '🤖 Bot Score',
-    tor: '🌐 Tor',
-    eu: '🇪🇺 EU',
-    speedTitle: '⚡ Speed Test',
-    latency: '🕐 Latency (RTT)',
-    download: '📥 Download Speed',
-    testing: 'Testing...',
-    startTest: '▶️ Start Test',
-    testing2: 'Testing...',
-    copied: '✅ Copied',
-    copy: '📋 Copy',
-    footer: 'Query Time',
   };
-
   return `<!DOCTYPE html>
-<html lang="${lang === 'zh' ? 'zh-CN' : 'en'}">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -378,11 +287,6 @@ function generateHTML(data) {
       font-weight: 600;
       margin-bottom: 8px;
     }
-    .header .subtitle {
-      color: var(--muted);
-      font-size: 14px;
-      font-family: monospace;
-    }
     .badge {
       display: inline-block;
       padding: 4px 12px;
@@ -394,14 +298,6 @@ function generateHTML(data) {
     .badge-ipv4 { background: rgba(88,166,255,0.15); color: var(--accent); }
     .badge-ipv6 { background: rgba(163,113,247,0.15); color: var(--purple); }
     .badge-env { background: rgba(63,185,80,0.15); color: var(--green); }
-    .badge-lang {
-      background: rgba(210,153,29,0.15); color: var(--orange);
-      cursor: pointer;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .badge-lang:hover { opacity: 0.8; }
-
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -460,8 +356,6 @@ function generateHTML(data) {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     .map-link:hover { text-decoration: underline; }
-
-    /* 复制按钮 */
     .copy-btn {
       background: transparent;
       border: 1px solid var(--border);
@@ -483,8 +377,6 @@ function generateHTML(data) {
       border-color: var(--green);
       color: var(--green);
     }
-
-    /* 测速按钮 */
     .speed-btn {
       background: rgba(88,166,255,0.12);
       border: 1px solid rgba(88,166,255,0.3);
@@ -510,14 +402,12 @@ function generateHTML(data) {
     }
     .speed-result.warn { color: var(--orange); }
     .speed-result.bad { color: var(--red); }
-
     .footer {
       text-align: center;
       color: var(--muted);
       font-size: 12px;
       margin-top: 20px;
     }
-
     @media (max-width: 500px) {
       body { padding: 20px 10px; }
       .card { padding: 16px; }
@@ -528,30 +418,11 @@ function generateHTML(data) {
 </head>
 <body>
   <div class="container">
-      <div style="display:flex; justify-content:center; margin-bottom:20px;">
-      <div id="live-clock-wrap" style="
-        display:inline-flex; align-items:center; gap:8px;
-        background:rgba(255,255,255,0.04);
-        border:1px solid rgba(255,255,255,0.08);
-        border-radius:40px;
-        padding:8px 22px;
-        backdrop-filter:blur(12px);
-        -webkit-backdrop-filter:blur(12px);
-        box-shadow:0 0 24px rgba(99,102,241,0.15), inset 0 0 12px rgba(99,102,241,0.06);
-      ">
-        <span style="font-size:16px;">🕐</span>
-        <span style="font-size:12px; font-weight:500; color:var(--secondary); letter-spacing:1px;">北京时间</span>
-        <span id="live-clock" style="font-size:17px; font-weight:700; color:var(--accent); font-family:'SF Mono','Fira Code','Consolas',monospace; letter-spacing:1px; text-shadow:0 0 12px rgba(99,102,241,0.5); min-width:190px;">--</span>
-      </div>
-    </div>
     <div class="header">
       <h1>🔍 ${T.title}</h1>
-      
       <span class="badge badge-${ipType === 'IPv6' ? 'ipv6' : 'ipv4'}">CF: ${ipType}</span>
       <span class="badge badge-env">${envIcon} ${esc(envType)}</span>
-      <a class="badge badge-lang" href="?lang=${lang === 'zh' ? 'en' : 'zh'}" title="Switch Language">${lang === 'zh' ? '🌐 EN' : '🌐 中文'}</a>
     </div>
-
     <!-- 位置信息 -->
     <div class="card">
       <div class="card-title">${T.location}</div>
@@ -567,6 +438,7 @@ function generateHTML(data) {
       <div class="row">
         <span class="label">${T.address}</span>
         <span class="value address">${esc(geoAddress)} <button class="copy-btn" onclick="copyText('${esc(geoAddress)}',this)">${T.copy}</button></span>
+      </div>` : ''}
       <div class="row">
         <span class="label">${T.coords}</span>
         <span class="value">
@@ -578,7 +450,6 @@ function generateHTML(data) {
       <div class="row"><span class="label">${T.timezone}</span><span class="value">${esc(timezone)}</span></div>
       <div class="row"><span class="label">${T.colo}</span><span class="value highlight">${esc(colo)}</span></div>
     </div>
-
     <!-- IP 信息 -->
     <div class="card">
       <div class="card-title">${T.ipTitle}</div>
@@ -595,7 +466,6 @@ function generateHTML(data) {
         <span class="value" id="ipv6-address">${T.detecting}</span>
       </div>
     </div>
-
     <!-- 网络信息 -->
     <div class="card">
       <div class="card-title">${T.networkTitle}</div>
@@ -604,7 +474,6 @@ function generateHTML(data) {
       <div class="row"><span class="label">${T.cipher}</span><span class="value" style="font-size:11px;">${esc(tlsCipher)}</span></div>
       <div class="row"><span class="label">${T.http}</span><span class="value">${esc(httpProtocol)}</span></div>
     </div>
-
     <!-- 客户端信息 -->
     <div class="card">
       <div class="card-title">${T.clientTitle}</div>
@@ -612,7 +481,6 @@ function generateHTML(data) {
       <div class="row"><span class="label">${T.os}</span><span class="value">${esc(os)}</span></div>
       <div class="row"><span class="label">${T.ua}</span><span class="value" style="font-size:11px;">${esc(UA)}</span></div>
     </div>
-
     <!-- 安全信息 -->
     <div class="card">
       <div class="card-title">${T.securityTitle}</div>
@@ -620,13 +488,6 @@ function generateHTML(data) {
       <div class="row"><span class="label">${T.tor}</span><span class="value">${isTor}</span></div>
       <div class="row"><span class="label">${T.eu}</span><span class="value">${isEU}</span></div>
     </div>
-
-    <!-- 小工具 -->
-    <div class="card">
-      <div class="card-title">${T.tool}</div>
-      <div class="row"><span class="label">${T.startTest}</span><span class="value">${botScore}</span></div>
-    </div>
-
     <!-- 测速 -->
     <div class="card">
       <div class="card-title">${T.speedTitle}</div>
@@ -643,24 +504,20 @@ function generateHTML(data) {
         <span class="value"><button class="speed-btn" id="speed-btn" onclick="runSpeedTest()">${T.startTest}</button></span>
       </div>
     </div>
-
     <div class="footer">
-      ⏰ ${T.footer}: ${formatBeijingTime()} · Powered by Cloudflare Workers
+      ⏰ ${T.footer}: ${timeStr} · Powered by Cloudflare Workers
     </div>
   </div>
-
   <script>
     // ===== 获取浏览器 IP =====
     async function fetchIP() {
       const ipv4El = document.getElementById('ipv4-address');
       const ipv6El = document.getElementById('ipv6-address');
-
       try {
         const v4Res = await fetch('https://api.ipify.org?format=json');
         const v4Data = await v4Res.json();
         ipv4El.textContent = v4Data.ip;
         ipv4El.classList.add('highlight');
-        // 加复制按钮
         const btn = document.createElement('button');
         btn.className = 'copy-btn';
         btn.textContent = '${T.copy}';
@@ -670,7 +527,6 @@ function generateHTML(data) {
         ipv4El.textContent = '${T.noIPv4}';
         ipv4El.style.color = 'var(--muted)';
       }
-
       try {
         const v6Res = await fetch('https://api6.ipify.org?format=json');
         const v6Data = await v6Res.json();
@@ -699,7 +555,6 @@ function generateHTML(data) {
           btn.classList.remove('copied');
         }, 1500);
       }).catch(() => {
-        // fallback
         const ta = document.createElement('textarea');
         ta.value = text;
         ta.style.position = 'fixed';
@@ -723,15 +578,13 @@ function generateHTML(data) {
       const btn = document.getElementById('speed-btn');
       const latencyEl = document.getElementById('latency-result');
       const speedEl = document.getElementById('speed-result');
-
       btn.disabled = true;
       btn.textContent = '${T.testing2}';
       latencyEl.textContent = '${T.testing}';
       latencyEl.className = 'value';
       speedEl.textContent = '${T.testing}';
       speedEl.className = 'value';
-
-      // --- 延迟测试：测 5 次取平均 ---
+      // --- 延迟测试 ---
       let totalRTT = 0;
       const pingCount = 5;
       for (let i = 0; i < pingCount; i++) {
@@ -743,28 +596,21 @@ function generateHTML(data) {
         totalRTT += (end - start);
       }
       const avgRTT = Math.round(totalRTT / pingCount);
-
-      // 显示延迟
       let rttClass = '';
       if (avgRTT < 50) rttClass = 'speed-result';
       else if (avgRTT < 150) rttClass = 'speed-result warn';
       else rttClass = 'speed-result bad';
       latencyEl.textContent = avgRTT + ' ms';
       latencyEl.className = 'value ' + rttClass;
-
       // --- 下载速度测试 ---
       const testUrl = window.location.origin + '/speedtest?nocache=' + Math.random();
       const startTime = performance.now();
       let totalBytes = 0;
-
       try {
         const response = await fetch(testUrl, { cache: 'no-store' });
         const reader = response.body.getReader();
-
-        // 最多测 5 秒
         const maxDuration = 5000;
         const startedAt = Date.now();
-
         while (true) {
           const { done, value } = await reader.read({});
           if (done) break;
@@ -774,47 +620,23 @@ function generateHTML(data) {
             break;
           }
         }
-
         const endTime = performance.now();
         const durationSec = (endTime - startTime) / 1000;
         const speedMbps = ((totalBytes * 8) / durationSec / 1000000).toFixed(2);
         const speedMBs = (totalBytes / durationSec / 1000000).toFixed(2);
-
         let speedClass = '';
         if (speedMbps >= 50) speedClass = 'speed-result';
         else if (speedMbps >= 10) speedClass = 'speed-result warn';
         else speedClass = 'speed-result bad';
-
         speedEl.textContent = speedMBs + ' MB/s (' + speedMbps + ' Mbps)';
         speedEl.className = 'value ' + speedClass;
-
       } catch(e) {
-        speedEl.textContent = 'Test failed';
+        speedEl.textContent = '测试失败';
         speedEl.className = 'value bad';
       }
-
       btn.disabled = false;
-      btn.textContent = T.startTest;
+      btn.textContent = '${T.startTest}';
     }
-
-    
-
-
-    // ===== 实时北京时间 =====
-    function updateClock() {
-     const now = new Date();
-     const Y = now.getFullYear();
-     const M = String(now.getMonth() + 1).padStart(2, '0');
-     const D = String(now.getDate()).padStart(2, '0');
-     const h = String(now.getHours()).padStart(2, '0');
-     const m = String(now.getMinutes()).padStart(2, '0');
-     const s = String(now.getSeconds()).padStart(2, '0');
-     const ms = String(now.getMilliseconds()).padStart(3, '0');
-     const el = document.getElementById('live-clock');
-     if (!el) return;
-     el.innerHTML = Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s + '<span style="font-size:12px;opacity:0.5;font-weight:500;">.' + ms + '</span>';
-}
-     
   </script>
 </body>
 </html>`;
