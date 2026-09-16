@@ -7,6 +7,7 @@
     <!-- 等宽数字字体，防止毫秒跳动时宽度抖动 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -105,6 +106,16 @@
             padding: 4px 12px; border-radius: 20px;
             font-size: 0.85rem; margin: 4px; color: #ccc;
         }
+        
+        .social-icons a {
+        font-size: 32px;          /* 图标大小 */
+        margin: 0 15px;           /* 间距 */
+        text-decoration: none;    /* 去掉下划线 */
+    }
+    .social-icons .fa-google   { color: #4285F4; }   /* Google 蓝 */
+    .social-icons .fa-youtube  { color: #FF0000; }   /* YouTube 红 */
+    .social-icons .fa-telegram { color: #0088cc; }   /* Telegram 蓝 */
+    
     </style>
 </head>
 <body>
@@ -125,19 +136,31 @@
             </div>
         </div>
 
+        <div class="social-icons">
+          <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-google"></i>
+          </a>
+          <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+          <a href="https://t.me/你的用户名" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-telegram"></i>
+          </a>
+        </div>
+        
         <!-- 链接按钮 -->
         <div class="links">
             <a href="https://cloudflare.com" target="_blank" rel="noopener noreferrer" class="link-btn">
-               cloudflare
+               CloudFlare
             </a>
             <a href="https://itdog.cn" target="_blank" rel="noopener noreferrer" class="link-btn">
-              ITdog
+              ITDOG
             </a>
             <a href="https://dnshe.com" target="_blank" rel="noopener noreferrer" class="link-btn">
                DNSHE
             </a>
             <a href="https://ip111.cn" target="_blank" rel="noopener noreferrer" class="link-btn">
-               ip查询
+               IP查询
             </a>
             <a href="https://yudou.us" target="_blank" rel="noopener noreferrer" class="link-btn">
                玉豆分享
@@ -148,16 +171,48 @@
             <a href="https://ceshi.327n.com" target="_blank" rel="noopener noreferrer" class="link-btn">
                奇优影院
             </a>
-            <a href="https://YOUTUBE.COM" target="_blank" rel="noopener noreferrer" class="link-btn">
-               YOUTUBE
+            <!-- YouTube -->
+            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+               <i class="fa-brands fa-youtube">
+               </i>
+                YOUTUBE
             </a>
-            <a href="https://GOOGLE.COM" target="_blank" rel="noopener noreferrer" class="link-btn">
+            <!-- Google -->
+            <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <i class="fa-brands fa-google">
+                </i>
                GOOGLE
             </a>
+            <!-- Telegram -->
             <a href="https://WEB.TELEGRAM.ORG" target="_blank" rel="noopener noreferrer" class="link-btn">
-               TELEGRAM
+                <i class="fa-brands fa-telegram">
+                </i>TELEGRAM
             </a>
-
+            <!-- Twitter/X -->
+            <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <i class="fa-brands fa-twitter">
+                </i>Twitter/X
+            </a>
+            <!-- Facebook -->
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <i class="fa-brands fa-facebook">
+                </i>Facebook
+            </a>
+            <!-- Instagram -->
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <i class="fa-brands fa-instagram">
+                </i>Instagram
+            </a>
+            <!-- Github -->
+            <a href="https://www.github.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <i class="fa-brands fa-github">
+                </i>Github
+            </a>
+             <!-- Tiktok -->
+            <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <i class="fa-brands fa-tiktok">
+                </i>Tiktok
+            </a>
         </div>
 
 
