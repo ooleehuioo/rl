@@ -169,8 +169,8 @@
         function tick() {
             const now = new Date();
             // 手动计算北京时间，避免 Intl 毫秒兼容性问题
-            const bj = getBeijingTime(); // ← 直接用校准后的北京时间
-
+            const bj = new Date(now.getTime() + (8 * 3600000 + now.getTimezoneOffset() * 60000));
+            
             const h  = String(bj.getHours()).padStart(2, '0');
             const m  = String(bj.getMinutes()).padStart(2, '0');
             const s  = String(bj.getSeconds()).padStart(2, '0');
