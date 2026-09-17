@@ -1,1 +1,87 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>css集</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff; min-height: 100vh; display: flex; align-items: center; 
+            justify-content: center; padding: 40px 16px; flex-direction:column; gap:20px; 
+            }
+
+        .container { text-align: center; display: grid; grid-template-columns:repeat(auto-fit,minmax(760px,1fr)); gap:20px; max-width:780px; width:100%; align-items: stretch; align-items: center; justify-content: center; margin-bottom: 20px; 
+                   }    
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 32px; margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1); display:flex; 
+            max-width: 780px; align-items:center;  width:100%;
+            } 
+        .header { display:flex; flex-direction:column; align-items:center; justify-content: center; gap: 8px; width: 100%; grid-column: 1 / -1; }
+        .header h1 { margin: 0; text-align: center; width: 100%; font-size:20px; font-weight:400; }
+        .subtitle{display: flex; width:100%; text-align:center; align-items:center; 
+                  flex-direction:column; }
+        .card-title{font-size:20px; display:flex; width:100%; }
+        .row{font-size:15px; display:flex; width:100%; padding:12px 10px}
+        @media (max-width: 600px) {
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <header>
+     <h1>CSS</h1>
+     <p class="subtitle">🧑‍💻 CSS · 📝 html · 🚀 js</p>
+     </header>
+     <!-- 介绍卡片 -->
+       <div class="card">
+         <div class="card-title">Flexbox基础布局</div>
+         <div class="row">
+           /* 水平垂直居中（弹窗/加载动画） */
+             .center-flex {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             height: 100vh;
+             }
+
+             /* 三栏自适应布局 */
+             .three-column {
+             display: flex;
+             }
+             .sidebar { flex: 0 0 200px; }
+             .main-content { flex: 1; margin: 0 20px; }</div>
+       </div> 
+       <div class="card">
+       <p>flex-direction:column;</p>
+       <p>让容器内的子元素‌从上到下垂直排列‌，同时将主轴方向改为垂直方向（必须先给父容器设置 display: flex 或 display: inline-flex）</p>
+       </div>
+       <div class="card">
+       <div class="card-title">Grid响应式布局</div>              
+       <span>/* 自适应网格（产品展示） */
+          .grid-container {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+          }
+          /* 复杂区域布局 */
+          .complex-layout {
+          display: grid;
+          grid-template-areas: 
+          "header header header"
+          "sidebar main aside"
+          "footer footer footer";
+          }</span>
+       </div>
+</div>    
+</body>
+</html>
+
+<p class="footer">© 2026 Lorraine · 由 Cloudflare Pages 驱动 · 全世界秒开 🚀</p>
+
