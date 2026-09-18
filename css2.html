@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浏览器标签卡片</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 20px; }
+        .container { display: flex; text-align: center; gap: 24px; flex-wrap: wrap; justify-content: center; width:100%; flex-direction: column; }
+        /* ========== 卡片容器 ========== */
+        .browser-card {
+            width: 380px; background: #fff; border-radius: 0 10px 10px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s; }
+        .browser-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        /* ========== 标签栏 ========== */
+        .tab-bar {
+            display: flex; align-items: flex-end; background: #e8eaed;
+            border-radius: 10px 10px 0 0; padding: 8px 10px 0; gap: 0; }
+        /* 当前标签页 = 卡片标题 */
+        .tab {
+            display: flex; align-items: center; gap: 8px; background: #fff;
+            padding: 10px 18px;border-radius: 10px 10px 0 0;font-size:1rem;
+            font-weight: 600;color: #202124;white-space: nowrap;cursor: default;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.04);position: relative;z-index: 1;
+        }
+        .tab i {
+            font-size: 14px;color: #5f6368;}
+        /* ========== 内容区 ========== */
+        .card-body {padding: 24px 20px 28px; }
+        .card-body p {font-size: 16px;color: #5f6368;line-height: 1.8;}
+        .card-body p1 {font-size: 12px;color: #5f6368;line-height: 1.8;}
+        /* ========== 深色版 ========== */
+        .browser-card.dark .tab-bar {background: #35363a;}
+        .browser-card.dark .tab {background: #202124;color: #e8eaed;}
+        .browser-card.dark .tab i {color: #9aa0a6;}
+        .browser-card.dark {background: #202124;}
+        .browser-card.dark .card-body p {color: #bdc1c6;}
+        h1 { font-size: 2.5rem; margin-bottom: 8px;
+             background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+             background-clip: text; }
+        .card {background: rgba(255, 255, 255, 0.05);backdrop-filter: blur(10px); 
+               -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 32px; 
+               margin-bottom: 24px;  border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+      <h1>CSS · 收集</h1>
+        <!-- == 第一 == -->
+        <div class="card">
+        <p>text-align: center = 让文字在元素内水平居中。</p>
+        <p>&ltp style="text-align: left/center/right;"&gt  靠左</p>
+        <p1>只对行内/行内块元素生效(文字/span/a/img)，对div块级无效但里面文字会居中</p1>
+        <p>margin: 0 auto = 让一个块级元素（如 div）整体水平居中</p>
+        <p>vertical-align: middle = 垂直方向对齐</p>
+        </div>
+        <!-- ========== 深色版1 ========== -->
+        <div class="browser-card dark">
+            <div class="tab-bar">
+                <div class="tab">
+                    <i class="fas fa-robot"></i>
+                    <span>css</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p style="background: pink;">text-align: center = 让文字在元素内水平居中。</p>
+                <p style="background: yellow;">&ltp style="text-align: left/center/right;"&gt  靠左</p>
+                <p1>只对行内/行内块元素生效(文字/span/a/img)，对div块级无效但里面文字会居中</p1>
+                <p>margin: 0 auto = 让一个块级元素（如 div）整体水平居中</p>
+                <p>vertical-align: middle = 垂直方向对齐</p>
+            </div>
+        </div>
+        <!-- ========== 深色版2 ========== -->
+        <div class="browser-card dark">
+            <div class="tab-bar">
+                <div class="tab">
+                    <i class="fas fa-robot"></i>
+                    <span>😘</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p style="background: pink;">基础</p>
+                <p style="background: purple;">&ltp> =段落(换行+段间距) &ltdiv> =块级容器(无间距纯容器) &ltspan> =行内容器(不换行) &lth1> =标题(加粗+不同大小) br =换行(无间距)</p>
+                <p1>只对行内/行内块元素生效(文字/span/a/img)，对div块级无效但里面文字会居中</p1>
+                <p>margin: 0 auto = 让一个块级元素（如 div）整体水平居中</p>
+                <p>vertical-align: middle = 垂直方向对齐</p>
+            </div>
+        </div>
+        <!-- ========== 浅色版 ========== -->
+        <div clss="card">
+        <i class="fas fa-globe"></i>
+        <span>🌐 我的网页标题</span>
+        <p style="background: yellow;">display: flex; 横向 flex-direction: column; 子元素竖向排列 ↓ flex-direction: row; 子元素横向排列 →</p>
+        <p1>&ltdiv style="display: flex;"&gt &ltp&gt段落1&lt/p&gt p会横向排列</p1>
+        </div>
+    </div> <!-- ==container== -->
+</body>
+</html>
