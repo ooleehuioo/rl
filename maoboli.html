@@ -1,0 +1,181 @@
+/* ============================================================
+   毛玻璃效果（Glassmorphism）完整实现
+   ============================================================ */
+
+/* ---------- 1. 基础毛玻璃卡片 ---------- */
+.glass-card {
+  /* 半透明背景（核心） */
+  background: rgba(255, 255, 255, 0.15);
+
+  /* 毛玻璃模糊（核心） */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px); /* Safari 兼容 */
+
+  /* 微妙的边框，增加玻璃质感 */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+
+  /* 内阴影增强通透感 */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  padding: 32px;
+  color: #fff;
+}
+
+
+/* ---------- 2. 深色毛玻璃（Apple 风格导航栏） ---------- */
+.glass-nav {
+  background: rgba(22, 22, 23, 0.8);
+
+  /* 加上 saturate 增强色彩饱和度，Apple 的招牌写法 */
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* ---------- 3. 浅色毛玻璃 ---------- */
+.glass-light {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+}
+
+
+/* ---------- 4. 彩色毛玻璃 ---------- */
+.glass-accent {
+  background: rgba(0, 113, 227, 0.2); /* 蓝色基调 */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 113, 227, 0.3);
+}
+
+
+/* ---------- 5. 悬停态增强 ---------- */
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+
+/* ---------- 6. 带渐变背景的毛玻璃 ---------- */
+.glass-gradient {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+}
+
+
+/* ---------- 7. 毛玻璃按钮 ---------- */
+.glass-btn {
+  padding: 12px 28px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.glass-btn:active {
+  transform: scale(0.97);
+}
+
+
+/* ---------- 8. 毛玻璃模态框 / 弹窗 ---------- */
+.glass-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.glass-modal {
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 24px 80px rgba(0, 0, 0, 0.5);
+}
+
+
+/* ---------- 9. iOS 风格毛玻璃标签栏 ---------- */
+.glass-tabbar {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 28px 28px 0 0;
+}
+
+
+/* ---------- 10. 带噪点纹理的毛玻璃（高级质感） ---------- */
+.glass-textured {
+  position: relative;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* 噪点纹理叠加层 */
+.glass-textured::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+📖 核心属性解释
+属性	作用	说明
+background: rgba(...)	半透明底色	数值越小越透明，通常 0.1 ~ 0.3
+backdrop-filter: blur(Npx)	核心：背景模糊	N 越大越模糊，常用 10~30px
+-webkit-backdrop-filter	Safari 兼容	必须加，否则 Safari 不生效
+saturate(180%)	色彩增强	Apple 惯用写法，让背后颜色更鲜艳
+border: 1px solid rgba(...)	玻璃边缘高光	白色半透明边框模拟玻璃厚度
+box-shadow	阴影	增强悬浮感和层次
+
+&ltdiv class="glass-card">
+  <h2>毛玻璃卡片</h2>
+  <p>这里的内容会呈现玻璃质感</p>
+</div&gt
