@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客 | 思考与笔记</title>
+
+  <style>
+    /* ========== CSS 变量 ========== */
+    :root {
+      --nav-height: 44px;
+      --nav-bg: rgba(22, 22, 23, 0.8);
+      --nav-text: #f5f5f7;
+      --nav-text-dim: #a1a1a6;
+      --nav-hover: #ffffff;
+      --dropdown-bg: rgba(22, 22, 23, 0.95);
+      --accent: #0071e3;
+
+      --blog-max-width: 1060px;
+      --card-radius: 18px;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-hover-bg: rgba(255, 255, 255, 0.07);
+      --tag-bg: rgba(255, 255, 255, 0.06);
+      --tag-hover-bg: rgba(255, 255, 255, 0.12);
+      --text-primary: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --text-tertiary: #86868b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 2px 12px rgba(0, 0, 0, 0.3);
+      --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ========== 全局重置 ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #000;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ========== 导航栏（从主页继承） ========== */
+    .global-nav {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      width: 100%;
+      height: var(--nav-height);
+      background: var(--nav-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: background 0.3s ease;
+    }
+
+    .global-nav.scrolled {
+      background: rgba(22, 22, 23, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-container {
+      max-width: 1024px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 100%;
+      color: var(--nav-text);
+      transition: color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .nav-logo:hover {
+      color: var(--nav-hover);
+    }
+
+    .nav-logo svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      list-style: none;
+      gap: 0;
+    }
+
+    .nav-item {
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 0 18px;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--nav-text-dim);
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      color: var(--nav-hover);
+      outline: none;
+    }
+
+    .nav-link.active {
+      color: var(--nav-hover);
+    }
+
+    /* 下拉菜单 */
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--dropdown-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-radius: 18px;
+      padding: 20px 24px;
+      min-width: 280px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+    }
+
+    .dropdown::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: var(--dropdown-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item:focus-within .dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(4px);
+    }
+
+    .dropdown-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+      margin-bottom: 10px;
+    }
+
+    .dropdown-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .dropdown-list li {
+      margin: 0;
+    }
+
+    .dropdown-list a {
+      display: block;
+      padding: 6px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #f5f5f7;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .dropdown-list a:hover {
+      color: #fff;
+    }
+
+    .dropdown-list .sub-text {
+      font-size: 12px;
+      font-weight: 400;
+      color: #86868b;
+      margin-top: 1px;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 10px 0;
+    }
+
+    .dropdown-featured {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .dropdown-featured a {
+      font-size: 13px;
+      font-weight: 400;
+      color: #a1a1a6;
+      padding: 4px 0;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .dropdown-featured a:hover {
+      color: #fff;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .nav-icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--nav-text-dim);
+      transition: color 0.2s ease;
+      padding: 0;
+    }
+
+    .nav-icon-btn:hover {
+      color: var(--nav-hover);
+    }
+
+    .nav-icon-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      pointer-events: none;
+    }
+
+    /* 汉堡菜单 */
+    .hamburger {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: var(--nav-text-dim);
+      transition: color 0.2s ease;
+    }
+
+    .hamburger:hover {
+      color: var(--nav-hover);
+    }
+
+    .hamburger-line {
+      position: relative;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-line::before,
+    .hamburger-line::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-line::before {
+      top: -6px;
+    }
+
+    .hamburger-line::after {
+      top: 6px;
+    }
+
+    .hamburger.active .hamburger-line {
+      background: transparent;
+    }
+
+    .hamburger.active .hamburger-line::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .hamburger.active .hamburger-line::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    /* 移动端菜单 */
+    .mobile-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .mobile-menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      top: var(--nav-height);
+      right: 0;
+      width: 320px;
+      max-width: 85vw;
+      height: calc(100vh - var(--nav-height));
+      background: rgba(22, 22, 23, 0.98);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      z-index: 9999;
+      overflow-y: auto;
+      padding: 24px 28px;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-section {
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 20px;
+    }
+
+    .mobile-menu-section:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-menu-category {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86868b;
+      margin-bottom: 8px;
+    }
+
+    .mobile-menu a {
+      display: block;
+      padding: 8px 0;
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: #f5f5f7;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .mobile-menu a:hover {
+      color: #fff;
+    }
+
+    .mobile-menu a.sub-link {
+      font-size: 14px;
+      color: #a1a1a6;
+      padding: 5px 0;
+    }
+
+    /* 搜索下拉 */
+    .search-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      transform: translateY(8px);
+      background: var(--dropdown-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-radius: 18px;
+      padding: 12px 16px;
+      min-width: 260px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+    }
+
+    .search-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(4px);
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .search-input-wrap svg {
+      width: 14px;
+      height: 14px;
+      fill: #86868b;
+      flex-shrink: 0;
+    }
+
+    .search-input-wrap input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .search-input-wrap input::placeholder {
+      color: #86868b;
+    }
+
+    .search-quick-links {
+      margin-top: 10px;
+    }
+
+    .search-quick-links span {
+      font-size: 11px;
+      color: #86868b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .search-quick-links a {
+      display: block;
+      font-size: 13px;
+      color: #a1a1a6;
+      text-decoration: none;
+      padding: 4px 0;
+      transition: color 0.15s;
+    }
+
+    .search-quick-links a:hover {
+      color: #fff;
+    }
+
+    /* ========== 博客 Hero ========== */
+    .blog-hero {
+      padding: 80px 20px 50px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(29, 29, 31, 0.6) 0%, transparent 100%);
+    }
+
+    .blog-hero-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .blog-hero h1 {
+      font-size: clamp(36px, 7vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+
+    .blog-hero .hero-desc {
+      font-size: clamp(16px, 2.5vw, 20px);
+      font-weight: 400;
+      color: var(--text-tertiary);
+      letter-spacing: -0.01em;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ========== 博客主布局 ========== */
+    .blog-main {
+      max-width: var(--blog-max-width);
+      margin: 0 auto;
+      padding: 0 22px 80px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* ========== 筛选栏 ========== */
+    .blog-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+      grid-column: 1 / -1;
+    }
+
+    .filter-btn {
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--text-secondary);
+      background: var(--tag-bg);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+    }
+
+    .filter-btn:hover {
+      color: var(--text-primary);
+      background: var(--tag-hover-bg);
+    }
+
+    .filter-btn.active {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    /* ========== 文章网格 ========== */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      align-content: start;
+    }
+
+    /* ========== 文章卡片 ========== */
+    .blog-card {
+      position: relative;
+      background: var(--card-bg);
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .blog-card:hover {
+      background: var(--card-hover-bg);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .blog-card-image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg, #1d1d1f 0%, #2a2a2c 100%);
+    }
+
+    .blog-card-body {
+      padding: 20px 22px 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .blog-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: -0.01em;
+    }
+
+    .blog-card-meta .card-category {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .blog-card-meta .dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+
+    .blog-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      transition: color 0.2s ease;
+    }
+
+    .blog-card:hover h3 {
+      color: #fff;
+    }
+
+    .blog-card-excerpt {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .blog-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .read-time {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .read-time svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+    }
+
+    .card-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+
+    .card-arrow svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--text-secondary);
+      transition: all 0.25s ease;
+    }
+
+    .blog-card:hover .card-arrow {
+      background: var(--accent);
+    }
+
+    .blog-card:hover .card-arrow svg {
+      fill: #fff;
+      transform: translateX(2px);
+    }
+
+    /* 特色大卡片 */
+    .blog-card.featured {
+      grid-column: 1 / -1;
+      flex-direction: row;
+    }
+
+    .blog-card.featured .blog-card-image {
+      width: 45%;
+      aspect-ratio: auto;
+      min-height: 260px;
+    }
+
+    .blog-card.featured .blog-card-body {
+      justify-content: center;
+    }
+
+    .blog-card.featured h3 {
+      font-size: 26px;
+    }
+
+    .blog-card.featured .blog-card-excerpt {
+      -webkit-line-clamp: 4;
+    }
+
+    /* ========== 分页 ========== */
+    .blog-pagination {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 40px;
+    }
+
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .page-btn:hover {
+      background: var(--tag-bg);
+      color: var(--text-primary);
+    }
+
+    .page-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .page-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* ========== 侧边栏 ========== */
+    .blog-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      position: sticky;
+      top: calc(var(--nav-height) + 24px);
+    }
+
+    .sidebar-card {
+      background: var(--card-bg);
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-card);
+      padding: 20px 22px;
+    }
+
+    .sidebar-card h4 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 14px;
+    }
+
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0071e3, #5ac8fa);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .sidebar-card .author-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .sidebar-card .author-bio {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag-cloud .tag {
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--tag-bg);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .tag-cloud .tag:hover {
+      background: var(--tag-hover-bg);
+      color: var(--text-primary);
+    }
+
+    .hot-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .hot-list li {
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .hot-list li:last-child {
+      border-bottom: none;
+    }
+
+    .hot-list a {
+      display: block;
+      padding: 10px 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      line-height: 1.35;
+    }
+
+    .hot-list a:hover {
+      color: #fff;
+    }
+
+    .subscribe-input-group {
+      display: flex;
+      gap: 0;
+    }
+
+    .subscribe-input-group input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 10px 0 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .subscribe-input-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .subscribe-input-group input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .subscribe-input-group button {
+      padding: 10px 16px;
+      border-radius: 0 10px 10px 0;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .subscribe-input-group button:hover {
+      background: #0077ed;
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 900px) {
+      .blog-main {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .blog-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .blog-card.featured {
+        flex-direction: column;
+      }
+
+      .blog-card.featured .blog-card-image {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        min-height: auto;
+      }
+
+      .blog-card.featured h3 {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 833px) {
+      .nav-menu {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-container {
+        padding: 0 16px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .blog-hero {
+        padding: 60px 16px 32px;
+      }
+
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .blog-main {
+        padding: 0 16px 60px;
+      }
+
+      .blog-sidebar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-icon-btn {
+        width: 30px;
+      }
+
+      .nav-icon-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .nav-logo svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .mobile-menu {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================== 导航栏 ==================== -->
+  <nav class="global-nav" id="globalNav">
+    <div class="nav-container">
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="首页">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 15.5v-11l6 5.5-6 5.5z" />
+        </svg>
+      </a>
+
+      <!-- 桌面菜单 -->
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html" class="nav-link">首页</a>
+        </li>
+        <li class="nav-item">
+          <a href="blog.html" class="nav-link active">博客</a>
+        </li>
+        <li class="nav-item">
+          <span class="nav-link">分类</span>
+          <div class="dropdown">
+            <div class="dropdown-title">按分类浏览</div>
+            <ul class="dropdown-list">
+              <li><a href="#">设计<span class="sub-text">UI/UX、视觉与交互</span></a></li>
+              <li><a href="#">前端<span class="sub-text">HTML、CSS 与 JavaScript</span></a></li>
+              <li><a href="#">产品<span class="sub-text">产品思维与方法论</span></a></li>
+              <li><a href="#">随笔<span class="sub-text">日常思考与记录</span></a></li>
+            </ul>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-featured">
+              <a href="#">🔥 热门文章</a>
+              <a href="#">🆕 最新发布</a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">关于</a>
+        </li>
+      </ul>
+
+      <!-- 右侧操作 -->
+      <div class="nav-actions">
+        <button class="nav-icon-btn" id="searchBtn" aria-label="搜索">
+          <svg viewBox="0 0 24 24">
+            <path d="M10 2a8 8 0 105.293 14.293l4 4 1.414-1.414-4-4A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z" />
+          </svg>
+        </button>
+        <!-- 搜索下拉 -->
+        <div class="search-dropdown" id="searchDropdown">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 105.293 14.293l4 4 1.414-1.414-4-4A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
+            <input type="text" placeholder="搜索文章..." />
+          </div>
+          <div class="search-quick-links">
+            <span>快速跳转</span>
+            <a href="#">CSS 设计系统</a>
+            <a href="#">响应式布局</a>
+            <a href="#">动画技巧</a>
+          </div>
+        </div>
+
+        <!-- 汉堡菜单 -->
+        <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 移动端遮罩 -->
+  <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+
+  <!-- 移动端菜单 -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-section">
+      <div class="mobile-menu-category">导航</div>
+      <a href="index.html">首页</a>
+      <a href="blog.html">博客</a>
+      <a href="#">关于</a>
+    </div>
+    <div class="mobile-menu-section">
+      <div class="mobile-menu-category">分类</div>
+      <a href="#" class="sub-link">设计</a>
+      <a href="#" class="sub-link">前端</a>
+      <a href="#" class="sub-link">产品</a>
+      <a href="#" class="sub-link">随笔</a>
+    </div>
+  </div>
+
+  <!-- ==================== 博客 Hero ==================== -->
+  <section class="blog-hero">
+    <span class="blog-hero-tag">Blog</span>
+    <h1>思考与笔记</h1>
+    <p class="hero-desc">
+      关于设计、技术与创造力的随想。这里记录着我对数字世界的观察与思考。
+    </p>
+  </section>
+
+  <!-- ==================== 博客主体 ==================== -->
+  <div class="blog-main">
+
+    <!-- 筛选栏 -->
+    <div class="blog-filters">
+      <button class="filter-btn active">全部</button>
+      <button class="filter-btn">设计</button>
+      <button class="filter-btn">前端</button>
+      <button class="filter-btn">产品</button>
+      <button class="filter-btn">随笔</button>
+      <button class="filter-btn">工具</button>
+    </div>
+
+    <!-- 文章列表 -->
+    <div class="blog-grid">
+
+      <!-- 特色大卡片 -->
+      <a href="#" class="blog-card featured">
+        <div class="blog-card-image" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="card-category">设计</span>
+            <span class="dot"></span>
+            <span>2026 年 9 月 15 日</span>
+          </div>
+          <h3>如何用 CSS 构建一个真正的 Apple 风格设计系统</h3>
+          <p class="blog-card-excerpt">
+            从毛玻璃效果到微妙的动画曲线，这篇文章深入探讨了如何将 Apple 的设计哲学转化为可复用的 CSS 代码。我们将分析 SF Pro 字体排印、动态颜色系统与无障碍设计之间的平衡。
+          </p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/></svg>
+              8 分钟阅读
+            </span>
+            <span class="card-arrow">
+              <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 卡片 2 -->
+      <a href="#" class="blog-card">
+        <div class="blog-card-image" style="background: linear-gradient(135deg, #1d1d1f 0%, #2d2d30 100%);"></div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="card-category">前端</span>
+            <span class="dot"></span>
+            <span>2026 年 9 月 10 日</span>
+          </div>
+          <h3>2026 年 CSS 新特性实战指南</h3>
+          <p class="blog-card-excerpt">原生嵌套、作用域样式、视图过渡 API——这些新特性正在重塑前端开发的工作流。</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/></svg>
+              12 分钟阅读
+            </span>
+            <span class="card-arrow">
+              <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 卡片 3 -->
+      <a href="#" class="blog-card">
+        <div class="blog-card-image" style="background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);"></div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="card-category">产品</span>
+            <span class="dot"></span>
+            <span>2026 年 9 月 5 日</span>
+          </div>
+          <h3>极简主义界面的隐性复杂性</h3>
+          <p class="blog-card-excerpt">为什么"简单"的界面往往需要最复杂的设计决策？探讨视觉简约与功能深度之间的微妙张力。</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/></svg>
+              6 分钟阅读
+            </span>
+            <span class="card-arrow">
+              <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 卡片 4 -->
+      <a href="#" class="blog-card">
+        <div class="blog-card-image" style="background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);"></div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="card-category">随笔</span>
+            <span class="dot"></span>
+            <span>2026 年 8 月 28 日</span>
+          </div>
+          <h3>深夜重构代码的浪漫</h3>
+          <p class="blog-card-excerpt">有时候，最好的代码不是写出来的，而是在万籁俱寂时被一点点雕琢出来的。</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/></svg>
+              4 分钟阅读
+            </span>
+            <span class="card-arrow">
+              <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 卡片 5 -->
+      <a href="#" class="blog-card">
+        <div class="blog-card-image" style="background: linear-gradient(135deg, #1a1a2e 0%, #1e1e30 100%);"></div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="card-category">工具</span>
+            <span class="dot"></span>
+            <span>2026 年 8 月 20 日</span>
+          </div>
+          <h3>我的 VS Code 配置：2026 版</h3>
+          <p class="blog-card-excerpt">分享一套经过精心调校的编辑器配置，包括主题、字体、插件和快捷键方案。</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/></svg>
+              7 分钟阅读
+            </span>
+            <span class="card-arrow">
+              <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 卡片 6 -->
+      <a href="#" class="blog-card">
+        <div class="blog-card-image" style="background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);"></div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="card-category">设计</span>
+            <span class="dot"></span>
+            <span>2026 年 8 月 14 日</span>
+          </div>
+          <h3>动态字体排印：让文字会呼吸</h3>
+          <p class="blog-card-excerpt">利用 CSS clamp() 与视口单位，创造出能够响应屏幕尺寸的流畅字体缩放体验。</p>
+          <div class="blog-card-footer">
+            <span class="read-time">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/></svg>
+              9 分钟阅读
+            </span>
+            <span class="card-arrow">
+              <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 分页 -->
+      <div class="blog-pagination">
+        <button class="page-btn" aria-label="上一页">
+          <svg viewBox="0 0 24 24"><path d="M16.707 4.707 9.414 12l7.293 7.293-1.414 1.414L6.586 12l8.707-8.707z"/></svg>
+        </button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">…</button>
+        <button class="page-btn">8</button>
+        <button class="page-btn" aria-label="下一页">
+          <svg viewBox="0 0 24 24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 侧边栏 ==================== -->
+    <aside class="blog-sidebar">
+
+      <!-- 关于作者 -->
+      <div class="sidebar-card">
+        <div class="author-avatar">L</div>
+        <div class="author-name">林远</div>
+        <p class="author-bio">设计师 & 前端开发者。痴迷于像素级的细节与优雅的交互。这里是我记录思考的地方。</p>
+      </div>
+
+      <!-- 热门文章 -->
+      <div class="sidebar-card">
+        <h4>热门文章</h4>
+        <ul class="hot-list">
+          <li><a href="#">如何用 CSS 构建 Apple 风格设计系统</a></li>
+          <li><a href="#">2026 年 CSS 新特性实战指南</a></li>
+          <li><a href="#">极简主义界面的隐性复杂性</a></li>
+          <li><a href="#">动态字体排印：让文字会呼吸</a></li>
+          <li><a href="#">我的 VS Code 配置：2026 版</a></li>
+        </ul>
+      </div>
+
+      <!-- 标签云 -->
+      <div class="sidebar-card">
+        <h4>探索标签</h4>
+        <div class="tag-cloud">
+          <a href="#" class="tag">CSS</a>
+          <a href="#" class="tag">设计系统</a>
+          <a href="#" class="tag">响应式</a>
+          <a href="#" class="tag">动画</a>
+          <a href="#" class="tag">字体排印</a>
+          <a href="#" class="tag">JavaScript</a>
+          <a href="#" class="tag">性能</a>
+          <a href="#" class="tag">工具链</a>
+          <a href="#" class="tag">UI/UX</a>
+          <a href="#" class="tag">极简主义</a>
+        </div>
+      </div>
+
+      <!-- 订阅 -->
+      <div class="sidebar-card">
+        <h4>订阅更新</h4>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5;">
+          每周一封邮件，直达你的收件箱。
+        </p>
+        <div class="subscribe-input-group">
+          <input type="email" placeholder="你的邮箱地址" />
+          <button>订阅</button>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- ==================== JS ==================== -->
+  <script>
+    (function () {
+      // 导航栏滚动效果
+      const nav = document.getElementById('globalNav');
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            nav.classList.toggle('scrolled', window.scrollY > 0);
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // 搜索下拉
+      const searchBtn = document.getElementById('searchBtn');
+      const searchDropdown = document.getElementById('searchDropdown');
+      if (searchBtn && searchDropdown) {
+        searchBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          searchDropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+          if (!searchDropdown.contains(e.target) && e.target !== searchBtn) {
+            searchDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // 汉堡菜单
+      const hamburger = document.getElementById('hamburgerBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileOverlay = document.getElementById('mobileOverlay');
+
+      function closeMobileMenu() {
+        hamburger?.classList.remove('active');
+        mobileMenu?.classList.remove('active');
+        mobileOverlay?.classList.remove('active');
+      }
+
+      hamburger?.addEventListener('click', () => {
+        const isOpen = hamburger.classList.toggle('active');
+        mobileMenu?.classList.toggle('active', isOpen);
+        mobileOverlay?.classList.toggle('active', isOpen);
+      });
+
+      mobileOverlay?.addEventListener('click', closeMobileMenu);
+
+      // 筛选按钮
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // 分页按钮
+      document.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
