@@ -1299,81 +1299,191 @@
           </div>
           <!-- 第四段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">🎨</div>
+            <h3 class="apd-title">背景与边框</h3>
+            <p class="apd-desc">background: #f8f9fa; background: linear-gradient(135deg, #667eea, #764ba2); background: url(bg.png) center/cover;</p>
+            <p class="apd-desc">/* 边框 */</p>
+            <p class="apd-desc">border: 1px solid #e0e0e0; border-left: 4px solid #3498db; /* 左侧强调线 */ border-bottom: 2px dashed #e74c3c; border-radius: 8px; /* 圆角 */ border-radius: 20px 4px 20px 4px; /* 不规则圆角 */</p>
+            <p class="apd-desc">/* 轮廓（不占空间） */</p>
+            <p class="apd-desc">outline: 2px solid #ff6b6b; outline-offset: 4px;</p>
           </div>
           <!-- 第五段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">🖱️</div>
+            <h3 class="apd-title">交互状态</h3>
+            <p class="apd-desc">p { cursor: pointer; user-select: none; /* 禁止选中文字 */ }</p>
+            <p class="apd-desc">p:hover { color: #e74c3c; background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }</p>
+            <p class="apd-desc">p:active { transform: scale(0.98); }</p>
+            <p class="apd-desc">p:first-child { } /* 第一个段落 */</p>
+            <p class="apd-desc">p:last-child { } /* 最后一个段落 */</p>
+            <p class="apd-desc">p:nth-child(odd) { } /* 奇数段落 */</p>
           </div>
           <!-- 第六段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">📐</div>
+            <h3 class="apd-title">布局与尺寸</h3>
+            <p class="apd-desc">/* 宽度限制 */</p>
+            <p class="apd-desc">max-width: 600px; width: 80%; min-width: 200px;</p>
+            <p class="apd-desc">/* 溢出处理 */</p>
+            <p class="apd-desc">overflow: hidden; overflow-x: auto; /* 横向滚动 */</p>
+            <p class="apd-desc">/* 盒模型 */</p>
+            <p class="apd-desc">box-sizing: border-box;</p>
           </div>
           <!-- 第七段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">✂️</div>
+            <h3 class="apd-title">文本截断</h3>
+            <p class="apd-desc">/* 单行省略号 */</p>
+            <p class="apd-desc">white-space: nowrap; overflow: hidden; text-overflow: ellipsis;</p>
+            <p class="apd-desc">/* 多行省略号（3行） */</p>
+            <p class="apd-desc">display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;</p>
+            <p class="apd-desc">/* 换行规则 */</p>
+            <p class="apd-desc">ord-break: break-all; /* 强制断词 */</p>
+            <p class="apd-desc">word-wrap: break-word; /* 长单词换行 */</p>
+            <p class="apd-desc">white-space: pre-wrap; /* 保留空格和换行 */</p>
           </div>
           <!-- 第八段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">📝</div>
+            <h3 class="apd-title">文字样式</h3>
+            <p class="apd-desc">/* 字体 */</p>
+            <p class="apd-desc">font-family: "PingFang SC", "Microsoft YaHei", sans-serif;font-size: 16px;font-weight: 400; /* normal | bold | 100-900 */
+font-style: italic; /* normal | italic */ font-variant: small-caps;/* 小型大写字母 */</p>
+            <p class="apd-desc">/* 文字颜色 */</p><p class="apd-desc">color: #333;color: rgba(0, 0, 0, 0.85);</p>
+            <p class="apd-desc">/* 文字装饰 */</p><p class="apd-desc">text-decoration: underline;text-decoration: line-through;text-decoration: underline wavy #e74c3c; /* 波浪下划线 */</p>
+            <p class="apd-desc">/* 文字阴影 */</p><p class="apd-desc">text-shadow: 2px 2px 4px rgba(0,0,0,0.3);</p>
+            <p class="apd-desc">/* 大小写转换 */</p><p class="apd-desc">text-transform: uppercase; /* lowercase | capitalize */</p>
           </div>
           <!-- 第九段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">📏</div>
+            <h3 class="apd-title">段落间距与对齐</h3>
+            <p class="apd-desc">/* 行高 */</p>
+            <p class="apd-desc">line-height: 1.8; line-height: 28px;</p>
+            <p class="apd-desc">/* 段间距 */</p>
+            <p class="apd-desc">margin: 16px 0; margin-top: 20px; margin-bottom: 10px;</p>
+            <p class="apd-desc">/* 内边距 */</p>
+            <p class="apd-desc">padding: 12px 20px; padding: 1em 2em;</p>
+            <p class="apd-desc">/* 对齐 */</p>
+            <p class="apd-desc">text-align: left; /* center | right | justify(两端对齐) */</p>
+            <p class="apd-desc">/* 首行缩进 */</p>
+            <p class="apd-desc">text-indent: 2em;</p>
+            <p class="apd-desc">/* 字间距 */</p>
+            <p class="apd-desc">letter-spacing: 1px;</p>
+            <p class="apd-desc">/* 词间距（英文） */</p>
+            <p class="apd-desc">word-spacing: 2px;</p>
           </div>
           <!-- 第十段 -->
           <div class="apd-card" tabindex="0" role="button">
             <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <h3 class="apd-title"text-align: center = 让文字在元素内水平居中</h3>
+            <p class="apd-desc">p style="text-align: left/center/right;"</p>
+              <p class="apd-desc">只对行内/行内块元素生效(文字/span/a/img)，对div块级无效但里面文字会居中</p>
+              <p class="apd-desc">margin: 0 auto = 让一个块级元素（如 div）整体水平居中</p>
+              <p class="apd-desc">vertical-align: middle = 垂直方向对齐</p>
+              <p class="apd-desc">flex-direction: column; = 纵向排列</p>
+              <p class="apd-desc">flex-wrap: wrap; =换行</p>
+              <p class="apd-desc">justify-content: center;居中</p>
+              <p class="apd-desc">justify-content: center/flex-start左/flex-end右/space-between两端对齐中间平分/space-around每个元素两边有间距; /* 水平居中 */</p>
+              <p class="apd-desc">align-items: center/flex-start上/flex-end下/stretch拉伸填满(默认); /* 垂直居中 */(对flex子元素生效)</p>
+              <p class="apd-desc">margin: 0 auto 自身居中于父容器</p>
           </div>
           <!-- 第十一段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">🎯</div>
+            <h3 class="apd-title">实用组合示例</h3>
+            <p class="apd-desc">/* 引用块风格 */</p>
+            <p class="apd-desc">.quote { padding: 16px 24px; border-left: 4px solid #3498db; background: #f0f6ff; color: #2c3e50; font-style: italic; border-radius: 0 8px 8px 0; line-height: 1.8; }</p>
+            <p class="apd-desc">/* 卡片风格 */</p>
+            <p class="apd-desc">.card-text { padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); line-height: 1.8; color: #555; transition: all 0.3s; } .card-text:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.12); transform: translateY(-4px); }</p>
+            <p class="apd-desc">/* 高亮提示 */</p>
+            <p class="apd-desc">.alert { padding: 12px 20px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; color: #856404;</p>
           </div>
           <!-- 第十二段 -->
           <div class="apd-card" tabindex="0" role="button">
-            <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <div class="apd-icon">⚡</div>
+            <h3 class="apd-title">特效</h3>
+            <p class="apd-desc">/* 阴影 */</p>
+            <p class="apd-desc">box-shadow: 0 2px 12px rgba(0,0,0,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* 内阴影 */</p>
+            <p class="apd-desc">/* 渐变文字 */</p>
+            <p class="apd-desc">background: linear-gradient(to right, #ff6b6b, #feca57); -webkit-background-clip: text; -webkit-text-fill-color: transparent;</p>
+            <p class="apd-desc">/* 透明度 */</p>
+            <p class="apd-desc">opacity: 0.8;</p>
+            <p class="apd-desc">/* 变换 */</p>
+            <p class="apd-desc">transform: rotate(2deg); transform: scale(1.05); transform: skewX(-5deg); transform: translateY(-4px);</p>
+            <p class="apd-desc">/* 过渡动画 */</p>
+            <p class="apd-desc">transition: all 0.3s ease;</p>
+            <p class="apd-desc">/* 滤镜 */</p>
+            <p class="apd-desc">filter: blur(1px); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));</p>
           </div>
           <!-- 第十三段 -->
           <div class="apd-card" tabindex="0" role="button">
             <div class="apd-icon">✦</div>
             <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <p class="apd-desc">p> =段落(换行+段间距)</p
+            div> =块级容器(无间距纯容器)
+            span> =行内容器(不换行)
+            h1> =标题(加粗+不同大小)
+            br =换行(无间距)
+            只对行内/行内块元素生效(文字/span/a/img)，对div块级无效但里面文字会居中
+            margin: 0 auto = 让一个块级元素（如 div）整体水平居中
+            vertical-align: middle = 垂直方向对齐
           </div>
           <!-- 第十四段 -->
           <div class="apd-card" tabindex="0" role="button">
             <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <h3 class="apd-title">Columns(内容自动分流)</h3>
+            <p class="apd-desc">div class="two-columns"</p>
+            <p class="apd-desc">.two-columns { column-count: 2; /* 分2列 */</p>
+            <p class="apd-desc">column-gap: 40px; /* 列间距 */</p>
+            <p class="apd-desc">column-rule: 1px solid #e0e0e0; /* 中间分隔线 */ }</p>
+            <p class="apd-desc">div class="container"</p>
+            <p class="apd-desc">div class="left"</p>
+            <p class="apd-desc">div class="right"</p>
+            <p class="apd-desc">.container { display: flex; gap: 20px; /* 两列间距 */ }</p>
+            <p class="apd-desc">.left { flex: 1; /* 占1份 */ background: #e8f4fd; padding: 20px; }</p>
+            <p class="apd-desc">.right { flex: 1; /* 占1份 */ background: #fff3e0; padding: 20px; }</p>
+            <p class="apd-desc">不等宽比例：.left { flex: 2; } /* 占 2/3 */ .right { flex: 1; } /* 占 1/3 */</p>
+            <p class="apd-desc">/* 或者用固定宽度 + 自适应 */ .left { width: 300px; flex-shrink: 0; } .right { flex: 1; }</p>
+            <p class="apd-desc">响应式（手机端自动变上下）：.container { display: flex; gap: 20px; } @media (max-width: 768px) { .container { flex-direction: column; /* 窄屏变上下 */ } }</p>
           </div>
           <!-- 第十五段 -->
           <div class="apd-card" tabindex="0" role="button">
             <div class="apd-icon">✦</div>
-            <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <h3 class="apd-title">最强大：Grid 布局</h3>
+            <p class="apd-desc">.container { display: grid; grid-template-columns: 1fr 1fr; /* 两列等宽 */ gap: 20px; }</p>
+            <p class="apd-desc">/* 不等宽 */ .container { grid-template-columns: 300px 1fr; /* 左侧固定300，右侧自适应 */</p>
+            <p class="apd-desc">grid-template-columns: 2fr 1fr; /* 2:1 比例 */</p>
+            <p class="apd-desc">grid-template-columns: 200px 1fr 200px; /* 三列，中间自适应 */</p>
+            <p class="apd-desc">侧边栏 + 主体:.layout { display: flex; min-height: 100vh; } .sidebar { width: 250px; background: #2c3e50; color: #fff; } .main { flex: 1; padding: 30px; }</p>
           </div>
           <!-- 第十六段 -->
           <div class="apd-card" tabindex="0" role="button">
             <div class="apd-icon">✦</div>
             <h3 class="apd-title">智能摘要</h3>
-            <p class="apd-desc">AI 自动提炼长文核心要点，一键生成结构化笔记。</p>
+            <p class="apd-desc">display: flex; 横向</p>
+            <p class="apd-desc">flex-direction: column; 子元素竖向排列 ↓</p>
+            <p class="apd-desc">flex-direction: row; 子元素横向排列 →</p>
+            <p class="apd-desc">&ltdiv style="display: flex;"&gt &ltp段落1/p&gt(p会横向排列)</p>
+          </div>
+          <!-- 第十七段 -->
+          <div class="apd-card" tabindex="0" role="button">
+            <div class="apd-icon">✦</div>
+            <h3 class="apd-title">主流断点方案</h3>
+            <p class="apd-desc">@media (max-width: 576px) { /* 手机 */ }</p>
+            <p class="apd-desc">@media (max-width: 768px) { /* 平板竖屏 */ }</p>
+            <p class="apd-desc">@media (max-width: 992px) { /* 平板横屏 / 小笔记本 */ }</p>
+            <p class="apd-desc">@media (max-width: 1200px) { /* 桌面 */ }</p>
+            <p class="apd-desc">@media (min-width: 1400px) { /* 大屏优化 */ }</p>
+          </div>
+          <!-- 第十八段 -->
+          <div class="apd-card" tabindex="0" role="button">
+            <div class="apd-icon">✦</div>
+            <h3 class="apd-title">阅读类窄版</h3>
+            <p class="apd-desc">.article { max-width: 680px; /* 理想阅读宽度：60~75个字符 */ margin: 0 auto; font-size: 17px; line-height: 1.8; </p>
+            <p class="apd-desc">通栏 + 内容区分离</p>
+            <p class="apd-desc">/* 背景通栏，内容居中限制宽度 */ .section { width: 100%; /* 背景铺满 */ background: #f5f5f5; </p>
+            <p class="apd-desc">.section-inner { max-width: 1200px; margin: 0 auto; padding: 60px 20px; </p>
           </div>
         </div>
 
