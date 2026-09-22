@@ -77,6 +77,14 @@
     margin: 0;
     font-weight: 400;
   }
+  .grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 20px; 
+  }
+  @supports not (backdrop-filter: blur(20px)) {
+  .apple-card { background: #ffffff; }
+}
 </style>
 </head>
 <body>
