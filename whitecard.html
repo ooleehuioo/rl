@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Style Card</title>
+<style>
+  /* 页面基础样式 - 模拟苹果官网浅灰背景 */
+  body {
+    margin: 0;
+    padding: 40px;
+    background-color: #f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* ✅ 核心：Apple 风格卡片 */
+  .apple-card {
+    /* 尺寸与布局 */
+    width: 320px;
+    padding: 28px;
+    border-radius: 20px; /* 苹果标志性大圆角 */
+    
+    /* 材质感：纯白底 + 柔和多层阴影 */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.04),
+      0 12px 28px rgba(0, 0, 0, 0.06);
+    
+    /* 过渡动画 */
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+                box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  /* 悬停交互：轻微上浮 + 阴影加深 */
+  .apple-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 
+      0 8px 20px rgba(0, 0, 0, 0.06),
+      0 20px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  /* 卡片内容排版 */
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #007AFF, #5AC8FA);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+  }
+
+  .card-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #86868b;
+    margin: 0;
+    font-weight: 400;
+  }
+</style>
+</head>
+<body>
+
+<div class="apple-card">
+  <div class="card-icon">✦</div>
+  <h3 class="card-title">智能摘要</h3>
+  <p class="card-desc">AI 自动提炼长文核心要点，一键生成结构化笔记，让信息处理更高效。</p>
+</div>
+
+</body>
+</html>
